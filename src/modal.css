@@ -1,0 +1,50 @@
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.75);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  width: clamp(320px, 50%, 480px);
+
+  padding: 1rem;
+
+  display: flex;
+  flex-direction: column;
+
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+.modal h2 {
+  width: 100%;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal form {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-actions {
+  width: 100%;
+  display: flex;
+  gap: 1rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+
+.modal-actions button {
+  height: 2rem;
+  width: 4rem;
+  border: 1px solid var(--border);
+}

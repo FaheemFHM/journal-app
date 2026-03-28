@@ -1,0 +1,7 @@
+
+/* App.css handles the styling of the App.jsx file */
+
+.app {
+  display: flex;
+  height: 100vh;
+}

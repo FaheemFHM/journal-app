@@ -1,0 +1,93 @@
+
+/* index.css handles the styling of the entire app */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  font-size: 16px;
+  line-height: 1.25rem;
+
+  /* dark theme */
+  --bg: #171717; /* main background */
+  --surface: #272727; /* cards and panels */
+  --border: #373737; /* borders */
+
+  --text: #e2e2e2; /* main text */
+  --text-muted: #c2c2c2; /* lesser text like subtitles */
+  --text-hover: #55ebd7; /* text in buttons when hovered */
+
+  --primary: #55ebd7; /* main brand colour */
+  --primary-hover: #29c4af; /* hover brand colour */
+}
+
+[data-theme="light"] {
+  --bg: #e2e2e2;
+  --surface: #f0f0f0;
+  --border: #d3d3d3;
+
+  --text: #171717;
+  --text-muted: #64748b;
+  --text-hover: #00bb99;
+
+  --primary: #00bb99;
+  --primary-hover: #00a385;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, Arial, sans-serif;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+button {
+  background-color: var(--surface);
+  color: var(--text);
+
+  border: none;
+  margin: 0px;
+  padding: 0px;
+}
+
+button:hover {
+  background-color: var(--border);
+  color: var(--text-hover);
+  cursor: pointer;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+  color: var(--text);
+
+  box-shadow: none;
+  outline: none;
+}
+
+textarea {
+  resize: vertical;
+  min-height: calc(1.25rem * 5);
+  max-height: 25vh;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--primary);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+}

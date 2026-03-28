@@ -1,0 +1,10 @@
+{
+  "notes": [
+    {
+      "id": 1,
+      "title": "First note",
+      "content": "Hello world",
+      "order": 0
+    }
+  ]
+}
