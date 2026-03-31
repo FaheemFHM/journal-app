@@ -45,17 +45,17 @@
 
 .search-box input {
   width: 100%;
-  padding: 0.75rem 0.75rem 0.75rem 2.5rem;
-  box-sizing: border-box;
+  padding: 0.5rem 0.5rem 0.5rem 2rem;
   background-color: var(--bg);
 }
 
 .search-box i {
   position: absolute;
-  left: 0.9rem;
+  left: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
+  font-size: 0.8rem;
 }
 
 .fss-container {
@@ -72,11 +72,12 @@
 
 .fss-label {
   color: var(--text-muted);
-  padding: 1rem 0 0.5rem 0;
+  padding: 1rem 0 0.25rem 0;
+  font-size: 0.8rem;
 }
 
-.sort-toggle {
-  padding: 0.75rem;
+.sort-toggle-projects {
+  padding: 0.5rem;
   background-color: var(--bg);
   margin-top: 0.25rem;
 }
@@ -119,7 +120,7 @@
 
 .project-card-footer {
   width: 100%;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
 }
 
@@ -144,7 +145,6 @@
 
   background-color: var(--bg);
   margin-left: 0.5rem;
-  font-size: 1rem;
 }
 
 .projects-footer button:hover {
@@ -163,7 +163,7 @@
   justify-content: space-between;
   align-items: center;
 
-  padding: 0.75rem;
+  padding: 0.6rem;
   background-color: var(--bg);
   border: 1px solid var(--border);
   border-radius: 0.5rem;
@@ -208,5 +208,94 @@
 .notes-panel {
   height: 100%;
   width: 100%;
+
   background-color: var(--bg);
+
+  display: flex;
+  flex-direction: column;
+}
+
+.content-header {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-header div {
+  /* border: 1px solid red; */
+}
+
+.content-heading-container {
+  gap: 1rem;
+}
+
+.content-heading {
+  height: 100%;
+  padding: 1rem 0 1.25rem 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.content-button {
+  height: 2.5rem;
+  aspect-ratio: 1 / 1;
+  font-size: 0.85rem;
+}
+
+.content-subheader {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  padding-top: 0.2rem;
+}
+
+.content-fss-labels {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  gap: 0.5rem;
+
+  padding: 0.75rem 1.25rem 0.2rem 0;
+  border-top: 1px solid var(--border);
+  margin-top: 0.75rem;
+}
+
+.content-fss-label {
+  width: 100%;
+}
+
+.content-fss{
+  gap: 0.5rem;
+
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.75rem;
+}
+
+.content-header .search-box input {
+  background-color: var(--surface);
+}
+
+.content-header .dropdown-button {
+  background-color: var(--surface);
+}
+
+.content-header .dropdown-button:hover {
+  background-color: var(--border);
+}
+
+.sort-toggle-notes {
+  height: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+.content-body {
+  width: 100%;
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.content-footer {
+  width: 100%;
 }

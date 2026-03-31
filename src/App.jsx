@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, act } from 'react';
 import './App.css'
 
 export default function App() {
@@ -61,7 +61,7 @@ function Dropdown({ options = [] }) {
 }
 
 function ProjectsPanel() {
-  const filterOptions = ["All", "Pinned", "Favourites", "Archived"];
+  const filterOptions = ["All", "Pinned", "Starred", "Archived"];
   const sortOptions = ["Modified", "Created", "Size"];
   const [sortDir, setSortDir] = useState(true);
 
@@ -90,30 +90,16 @@ function ProjectsPanel() {
           </div>
         </div>
         <button
-          className='sort-toggle'
+          className='sort-toggle-projects'
           onClick={() => handleSortDir(!sortDir)}
         >
           Sort {sortDir ? "Ascending" : "Descending"}
         </button>
       </div>
       <div className='projects-body'>
-        <ProjectCard />
-        <ProjectCard />
-        <ProjectCard />
-        <ProjectCard />
-        <ProjectCard />
-        <ProjectCard />
-        <ProjectCard />
-        <ProjectCard />
-        <ProjectCard />
-        <ProjectCard />
-        <ProjectCard />
-        <ProjectCard />
-        <ProjectCard />
-        <ProjectCard />
-        <ProjectCard />
-        <ProjectCard />
-        <ProjectCard />
+        {Array.from({length: 40}).map((_, index) => (
+          <ProjectCard key={index} />
+        ))}
       </div>
       <div className='projects-footer'>
         <input type='text' placeholder='New project...'></input>
@@ -124,7 +110,7 @@ function ProjectsPanel() {
 }
 
 function ProjectCard({
-  txt = "",
+  txt = "My Project Title",
   len = 0,
   mod = "2h",
   pin = Math.random() < 0.4,
@@ -134,24 +120,88 @@ function ProjectCard({
   return (
     <div className='project-card'>
       <div className={`project-card-header ${arch ? "cross-out" : ""}`}>
-        <span>My Project Title</span>
+        <span>{txt}</span>
         <i className={`bi ${pin ? "bi-pin-angle-fill" : ""}`}></i>
         <i className={`bi ${fav ? "bi-star-fill" : ""}`}></i>
       </div>
       <div className={`project-card-footer ${arch ? "cross-out" : ""}`}>
         {len} notes 
         <i className='bi bi-dot'></i> 
-        Updated {mod} ago
+        Modified {mod} ago
       </div>
     </div>
   );
 }
 
 function NotesPanel() {
+  const filterOptions = ["All", "Pinned", "Starred", "Image", "Title", "Text", "Separator"];
+  const sortOptions = ["Modified", "Created", "Custom"];
+  const [sortDir, setSortDir] = useState(true);
+
+  const handleSortDir = (value) =>{
+    setSortDir(value);
+  };
+
   return (
     <div className='notes-panel'>
-      //
+      <div className='content-header'>
+        <div className='flexrow content-heading-container'>
+          <div className='content-heading'>
+            My Project Title
+          </div>
+          <i className='bi bi-dot'></i>
+          <ContentButton icon='pin-angle' iconAlt='pin-angle-fill'/>
+          <ContentButton icon='star' iconAlt='star-fill'/>
+          <i className='bi bi-dot'></i>
+          <ContentButton icon='archive' iconAlt='archive-fill'/>
+          <ContentButton icon='trash3' iconAlt='trash3-fill'/>
+        </div>
+        <div className='flexrow content-subheader'>
+          Created [ Jan 15, 2026 ] [ 36 days ago ] 
+          <i className='bi bi-dot'></i> 
+          Modified [ Feb 27, 2026 ] [ 2 hours ago ]
+        </div>
+        <div className='flexrow content-fss-labels'>
+          <div className='content-fss-label'>Search</div>
+          <div className='content-fss-label'>Filter</div>
+          <div className='content-fss-label'>Sort</div>
+          <button className='sort-toggle-notes' style={{visibility: 'hidden'}} ></button>
+        </div>
+        <div className='flexrow content-fss'>
+          <div className="search-box">
+            <i className="bi bi-search"></i>
+            <input type="text" placeholder="Search notes..." />
+          </div>
+          <Dropdown options={filterOptions} />
+          <Dropdown options={sortOptions} />
+          <button
+            className='sort-toggle-notes'
+            onClick={() => handleSortDir(!sortDir)}
+          >
+            <i className={`bi bi-sort-${sortDir ? "up" : "down"}`}></i>
+          </button>
+        </div>
+      </div>
+      <div className='content-body'></div>
+      <div className='content-footer'></div>
     </div>
+  );
+}
+
+function ContentButton({icon = "star", iconAlt = "starFill"}) {
+  const [active, setActive] = useState(false);
+
+  const handleActive = (value) => {
+    setActive(value);
+  }
+
+  return (
+    <button
+      className='content-button'
+      onClick={() => handleActive(!active)}
+    >
+      <i className={`bi bi-${active ? iconAlt : icon}`}></i>
+    </button>
   );
 }
 
