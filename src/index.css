@@ -18,8 +18,7 @@
 
   --text: #e2e2e2; /* main text */
   --text-muted: #c2c2c2; /* lesser text like subtitles */
-  --text-hover: #55ebd7; /* text in buttons when hovered */
-
+  
   --primary: #55ebd7; /* main brand colour */
   --primary-hover: #29c4af; /* hover brand colour */
 }
@@ -31,7 +30,6 @@
 
   --text: #171717;
   --text-muted: #64748b;
-  --text-hover: #00bb99;
 
   --primary: #00bb99;
   --primary-hover: #00a385;
