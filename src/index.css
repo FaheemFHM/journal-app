@@ -5,12 +5,26 @@
 *::before,
 *::after {
   box-sizing: border-box;
+  font-family: system-ui, sans-serif, Arial;
 }
 
 :root {
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1rem;
 
+  /* light theme */
+  --bg: #ffffff;
+  --surface: #fafafa;
+  --border: #eaeaea;
+
+  --text: #333333;
+  --text-muted: #64748b;
+
+  --primary: #00bb99;
+  --primary-hover: #00a385;
+}
+
+[data-theme="dark"] {
   /* dark theme */
   --bg: #171717; /* main background */
   --surface: #272727; /* cards and panels */
@@ -23,23 +37,11 @@
   --primary-hover: #29c4af; /* hover brand colour */
 }
 
-[data-theme="light"] {
-  --bg: #e2e2e2;
-  --surface: #f0f0f0;
-  --border: #d3d3d3;
-
-  --text: #171717;
-  --text-muted: #64748b;
-
-  --primary: #00bb99;
-  --primary-hover: #00a385;
-}
-
 body {
   margin: 0;
+  padding: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: system-ui, Arial, sans-serif;
 }
 
 #root {
@@ -50,23 +52,24 @@ button {
   background-color: var(--surface);
   color: var(--text);
 
-  border: none;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+
   margin: 0px;
   padding: 0px;
+  cursor: pointer;
 }
 
 button:hover {
   background-color: var(--border);
-  color: var(--text-hover);
-  cursor: pointer;
 }
 
 input, textarea {
   width: 100%;
-  padding: 0.5rem 0.75rem;
-  margin-bottom: 1rem;
 
   border: 1px solid var(--border);
+  border-radius: 0.5rem;
+
   background-color: var(--surface);
   color: var(--text);
 
@@ -88,4 +91,16 @@ textarea:focus {
 input::placeholder,
 textarea::placeholder {
   color: var(--text-muted);
+}
+
+.bi-pin-angle-fill {
+  color: rgb(255, 50, 50);
+}
+
+.bi-star-fill {
+  color: gold;
+}
+
+.cross-out {
+  text-decoration: line-through;
 }

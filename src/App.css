@@ -1,7 +1,212 @@
 
-/* App.css handles the styling of the App.jsx file */
+/* ======================== APP ======================== */
 
 .app {
   display: flex;
   height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* ======================== PROJECTS ======================== */
+
+.projects-panel {
+  height: 100%;
+  min-width: 20rem;
+  display: flex;
+  flex-direction: column;
+
+  background-color: var(--surface);
+  border-right: 3px solid var(--border);
+  padding: 0rem 0.5rem 0rem 1rem;
+  overflow: hidden;
+}
+
+.projects-header {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 3px solid var(--border);
+}
+
+.projects-heading {
+  font-size: 1.25rem;
+  font-weight: 500;
+  padding: 1.5rem 0 1rem 0;
+}
+
+.search-box {
+  position: relative;
+  width: 100%;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+  box-sizing: border-box;
+  background-color: var(--bg);
+}
+
+.search-box i {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.fss-container {
+  width: 100%;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.fss-box {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.fss-label {
+  color: var(--text-muted);
+  padding: 1rem 0 0.5rem 0;
+}
+
+.sort-toggle {
+  padding: 0.75rem;
+  background-color: var(--bg);
+  margin-top: 0.25rem;
+}
+
+.projects-body {
+  width: 100%;
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow-y: scroll;
+  padding-right: 0.5rem;
+}
+
+.project-card {
+  width: 100%;
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 0.25rem;
+}
+
+.project-card:hover {
+  cursor: pointer;
+  background-color: var(--border);
+}
+
+.project-card-header {
+  width: 100%;
+  margin-bottom: 0.5rem;
+  display: flex;
+}
+
+.project-card-header span {
+  width: 100%;
+}
+
+.project-card-header i {
+  margin: 0 0.25rem;
+}
+
+.project-card-footer {
+  width: 100%;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.projects-footer {
+  width: 100%;
+  display: flex;
+  margin-top: 1rem;
+  padding: 1rem 0;
+  border-top: 3px solid var(--border);
+}
+
+.projects-footer input {
+  width: 100%;
+  padding: 0.75rem;
+  box-sizing: border-box;
+  background-color: var(--bg);
+}
+
+.projects-footer button {
+  height: 100%;
+  aspect-ratio: 1 / 1;
+
+  background-color: var(--bg);
+  margin-left: 0.5rem;
+  font-size: 1rem;
+}
+
+.projects-footer button:hover {
+  background-color: var(--border);
+}
+
+/* ======================== DROPDOWN ======================== */
+
+.dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0.75rem;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+
+  cursor: pointer;
+}
+
+.dropdown-button:hover {
+  background-color: var(--border);
+}
+
+.dropdown i {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.dropdown-contents {
+  position: absolute;
+  width: 100%;
+  
+  margin-top: -1px;
+
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background-color: var(--bg);
+
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-contents div {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+}
+
+.dropdown-contents div:hover {
+  background-color: var(--border);
+}
+
+/* ======================== NOTES ======================== */
+
+.notes-panel {
+  height: 100%;
+  width: 100%;
+  background-color: var(--bg);
 }
