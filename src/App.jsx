@@ -113,8 +113,8 @@ function ProjectCard({
   txt = "My Project Title",
   len = 0,
   mod = "2h",
-  pin = Math.random() < 0.4,
-  fav = Math.random() < 0.45,
+  pin = Math.random() < 0.2,
+  fav = Math.random() < 0.4,
   arch = Math.random() < 0.2
 }) {
   return (
@@ -150,11 +150,11 @@ function NotesPanel() {
             My Project Title
           </div>
           <i className='bi bi-dot'></i>
-          <ContentButton icon='pin-angle' iconAlt='pin-angle-fill'/>
-          <ContentButton icon='star' iconAlt='star-fill'/>
+          <IconFillButton icon='pin-angle' iconAlt='pin-angle-fill' classList='content-button' />
+          <IconFillButton icon='star' iconAlt='star-fill' classList='content-button' />
           <i className='bi bi-dot'></i>
-          <ContentButton icon='archive' iconAlt='archive-fill'/>
-          <ContentButton icon='trash3' iconAlt='trash3-fill'/>
+          <IconFillButton icon='archive' iconAlt='archive-fill' classList='content-button' />
+          <IconFillButton icon='trash3' iconAlt='trash3-fill' classList='content-button' />
         </div>
         <div className='flexrow content-subheader'>
           Created [ Jan 15, 2026 ] [ 36 days ago ] 
@@ -182,14 +182,65 @@ function NotesPanel() {
           </button>
         </div>
       </div>
-      <div className='content-body'></div>
-      <div className='content-footer'></div>
+      <div className='content-body'>
+        {
+          Array.from({length: 100}).map((_, index) => (
+            <NoteCard
+              key={index}
+              id={index}
+              text={"This is some note."}
+              pin={Math.random() < 0.5}
+              fav={Math.random() < 0.5}
+            />
+          ))
+        }
+      </div>
+      <div className='content-footer'>
+        <input type='text' placeholder='New note...'></input>
+        <button><i className='bi bi-plus-circle'></i></button>
+      </div>
     </div>
   );
 }
 
-function ContentButton({icon = "star", iconAlt = "starFill"}) {
-  const [active, setActive] = useState(false);
+function NoteCard({
+  id = -1,
+  text = "",
+  pin = false,
+  fav = false,
+}) {
+  return(
+    <div className='note-card'>
+      <button className='note-card-drag'>
+        <i className='bi bi-grip-vertical'></i>
+      </button>
+      <div className='note-card-text'>{text}</div>
+      <div className='note-card-reactions-container'>
+        <div className='note-card-id'>{id}</div>
+        <IconFillButton
+          icon='pin-angle'
+          iconAlt='pin-angle-fill'
+          classList='note-card-reaction'
+          startActive={pin}
+        />
+        <IconFillButton
+          icon='star'
+          iconAlt='star-fill'
+          classList='note-card-reaction'
+          startActive={fav}
+        />
+      </div>
+    </div>
+  );
+}
+
+function IconFillButton({
+  icon = "star",
+  iconAlt = "starFill",
+  classList = "",
+  startActive = false,
+}) {
+  const [active, setActive] = useState(startActive);
 
   const handleActive = (value) => {
     setActive(value);
@@ -197,7 +248,7 @@ function ContentButton({icon = "star", iconAlt = "starFill"}) {
 
   return (
     <button
-      className='content-button'
+      className={`${classList} ${active ? 'active' : ''}`}
       onClick={() => handleActive(!active)}
     >
       <i className={`bi bi-${active ? iconAlt : icon}`}></i>
