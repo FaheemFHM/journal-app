@@ -78,6 +78,21 @@ export default function NotesPanel({
       year: "numeric",
     });
   }
+
+  function highlightSearchTerms(noteText) {
+    if (!search) return noteText;
+
+    const regex = new RegExp(`(${search})`, "gi");
+    const parts = noteText.split(regex);
+
+    return parts.map((part, index) => 
+      part.toLowerCase() === search.toLowerCase() ? (
+        <span key={index} className="highlight">{part}</span>
+      ) : (
+        part
+      )
+    );
+  }
   
   return (
     <div className='notes-panel'>
@@ -170,6 +185,7 @@ export default function NotesPanel({
           <NoteCard
             key={n.id}
             note={n}
+            text={highlightSearchTerms(n.text)}
           />
         ))}
       </div>
@@ -183,14 +199,15 @@ export default function NotesPanel({
 }
 
 function NoteCard({
-  note
+  note,
+  text
 }) {
   return(
     <div className='note-card'>
       <button className='note-card-drag'>
         <i className='bi bi-grip-vertical'></i>
       </button>
-      <div className='note-card-text'>{note.text}</div>
+      <div className="note-card-text">{text}</div>
       <div className='note-card-reactions-container'>
         <div className='note-card-id'>{note.id}</div>
         <IconFillButton

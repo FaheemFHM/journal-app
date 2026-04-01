@@ -141,6 +141,10 @@
   line-height: 1.25rem;
 }
 
+.highlight {
+  background-color: var(--primary);
+}
+
 .note-card-reactions-container {
   height: 100%;
   min-height: 6rem;
