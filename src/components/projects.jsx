@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import "./projects.css";
 import { timeAgo } from "../utils.js";
 
@@ -10,14 +10,54 @@ export default function ProjectsPanel({
   notesByProject,
   handleProject
 }) {
-  const [sortDir, setSortDir] = useState(true);
-
-  const handleSortDir = (value) => {
-    setSortDir(value);
-  };
-
   const filterOptions = ["All", "Pinned", "Starred", "Archived"];
   const sortOptions = ["Modified", "Created", "Size"];
+
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState(filterOptions[0]);
+  const [sort, setSort] = useState(sortOptions[0]);
+  const [sortDir, setSortDir] = useState(false);
+
+  const filteredProjects = useMemo(() => {
+    return [...projects]
+    // search
+    .filter(p => {
+      if (!search.trim()) return true;
+      return p.title.toLowerCase().includes(search.toLowerCase());
+    })
+    // filter
+    .filter(p => {
+      if (filter === "All") return true;
+      if (filter === "Pinned") return p.ispinned;
+      if (filter === "Starred") return p.isstarred;
+      if (filter === "Archived") return p.isarchived;
+      return true;
+    })
+    // sort
+    .sort((a, b) => {
+      let valA, valB;
+
+      if (sort === "Modified") {
+        valA = new Date(a.datetimemodified);
+        valB = new Date(b.datetimemodified);
+      } else if (sort === "Created") {
+        valA = new Date(a.datetimecreated);
+        valB = new Date(b.datetimecreated);
+      } else if (sort === "Size") {
+        valB = notesByProject[a.id] || 0;
+        valA = notesByProject[b.id] || 0;
+      }
+      
+      return sortDir ? valA - valB : valB - valA;
+    });
+  }, [projects, search, filter, sort, sortDir, notesByProject]);
+
+  const resetFilters = () => {
+    setSearch("");
+    setFilter(filterOptions[0]);
+    setSort(sortOptions[0]);
+    setSortDir(false);
+  };
   
   return (
     <div className='projects-panel'>
@@ -26,28 +66,39 @@ export default function ProjectsPanel({
 
         <div className="search-box">
           <i className="bi bi-search"></i>
-          <input type="text" placeholder="Search projects..." />
+          <input
+            type="text"
+            placeholder="Search projects..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
 
         <div className='fss-container'>
           <div className='fss-box'>
             <div className='fss-label'>Filter</div>
-            <Dropdown options={filterOptions} />
+            <Dropdown options={filterOptions} value={filter} onChange={setFilter} />
           </div>
           <div className='fss-box'>
             <div className='fss-label'>Sort</div>
-            <Dropdown options={sortOptions} />
+            <Dropdown options={sortOptions} value={sort} onChange={setSort} />
           </div>
         </div>
         <button
           className='sort-toggle-projects'
-          onClick={() => handleSortDir(!sortDir)}
+          onClick={() => setSortDir(!sortDir)}
         >
           Sort {sortDir ? "Ascending" : "Descending"}
         </button>
+        <button
+          className='sort-toggle-projects'
+          onClick={() => resetFilters()}
+        >
+          Reset Filters
+        </button>
       </div>
       <div className='projects-body'>
-        {projects.map(p => (
+        {filteredProjects.map(p => (
           <ProjectCard
             key={p.id}
             project={p}
