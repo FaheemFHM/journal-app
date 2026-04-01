@@ -18,7 +18,7 @@
 
   background-color: var(--surface);
   border-right: 3px solid var(--border);
-  padding: 0rem 0.5rem 0rem 1rem;
+  padding: 0rem 1rem 0rem 1rem;
   overflow: hidden;
 }
 
@@ -208,7 +208,7 @@
   height: 100%;
   width: 100%;
 
-  padding: 0rem 1rem 0rem 0.5rem;
+  padding: 0rem 1rem 0rem 1rem;
   background-color: var(--bg);
 
   display: flex;

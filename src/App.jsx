@@ -19,13 +19,14 @@ export default function App() {
   ];
 
   function handleThemeIndex(newIndex = null) {
-    if (newIndex === null) {
-      setThemeIndex(prev => (prev + 1) % themes.length);
-    } else {
-      setThemeIndex((newIndex + themes.length) % themes.length);
-    }
+    setThemeIndex(nextThemeIndex(newIndex));
   }
   
+  function nextThemeIndex(curIndex = null) {
+    const t = curIndex || themeIndex;
+    return (t + 1 + themes.length) % themes.length;
+  }
+
   useEffect(() => {
     document.documentElement.setAttribute(
       "data-theme",
@@ -37,7 +38,7 @@ export default function App() {
     <div className='app'>
       <ProjectsPanel />
       <NotesPanel
-        theme={themes[themeIndex]}
+        theme={themes[nextThemeIndex()]}
         handleThemeIndex={handleThemeIndex}
       />
     </div>
