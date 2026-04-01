@@ -113,7 +113,7 @@ export default function App() {
     return acc;
   }, {});
 
-  // ===  icon toggle handlers ===
+  // === edit project/note handlers ===
 
   function handleToggleProject(pId, field) {
     const newDate = new Date().toISOString();
@@ -189,6 +189,49 @@ export default function App() {
     });
   }
 
+  function handleEditProject(pId, value) {
+    const newDate = new Date().toISOString();
+
+    setProjects(prev => {
+      // get project to update
+      const prevState = [...prev];
+      const projectToUpdate = prevState.find(p => p.id === pId);
+      const trimmed = value.trim();
+
+      // if it doesn't exist, or the value hasn't changed, return
+      if (!projectToUpdate) return prev;
+      if (!trimmed) return prev;
+      if (projectToUpdate.title === trimmed) return prev;
+      
+      // update the project in the list/state
+      const newState = prevState.map(p =>
+        p.id === pId ? {
+          ...p,
+          title: trimmed,
+          datetimemodified: newDate
+        } : p
+      );
+
+      // backend update
+      fetch(`http://localhost:5000/projects/${pId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: trimmed,
+          datetimemodified: newDate
+        })
+      }).catch(() => {
+        setProjects(prevState);
+      });
+
+      return newState;
+    });
+  }
+
+  function handleEditNote(nId, value) {
+    //
+  }
+
   return (
     <div className='app'>
       <ProjectsPanel
@@ -203,6 +246,7 @@ export default function App() {
         handleThemeIndex={handleThemeIndex}
         onToggleProject={handleToggleProject}
         onToggleNote={handleToggleNote}
+        handleEditProject={handleEditProject}
       />
     </div>
   );

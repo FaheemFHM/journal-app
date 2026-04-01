@@ -12,6 +12,7 @@ export default function NotesPanel({
   handleThemeIndex,
   onToggleProject,
   onToggleNote,
+  handleEditProject,
 }) {
   const filterOptions = ["All", "Pinned", "Starred"];
   const sortOptions = ["Position", "Modified", "Created", "ID"];
@@ -63,13 +64,6 @@ export default function NotesPanel({
     setSort(sortOptions[0]);
     setSortDir(true);
   };
-  
-  const handleChangeTitle = (newTitle) => {
-    setProject(prev => ({
-      ...prev,
-      title: newTitle
-    }));
-  };
 
   function formatDate(dateString) {
     const date = new Date(dateString);
@@ -101,8 +95,9 @@ export default function NotesPanel({
       <div className='content-header'>
         <div className='flexrow content-heading-container'>
           <ProjectTitleInput
-            initValue={project.title}
-            onChangeTitle={handleChangeTitle}
+            value={project.title}
+            projectId={project.id}
+            handleEditProject={handleEditProject}
           />
           <i className='bi bi-dot'></i>
           <IconFillButton
@@ -271,26 +266,43 @@ function IconFillButton({ icon, iconAlt, classList, active, onToggle }) {
 }
 
 function ProjectTitleInput({
-  initValue = "Empty Title",
-  onChangeTitle
+  value = "Empty Title",
+  projectId,
+  handleEditProject
 }) {
-  const [value, setValue] = useState(initValue);
+  const [localValue, setLocalValue] = useState(value);
 
+  // set initial value
   useEffect(() => {
-    setValue(initValue);
-  }, [initValue]);
+    setLocalValue(value);
+  }, [value]);
 
+  // immediately change ui
   function handleChange(e) {
-    const newValue = e.target.value;
-    setValue(newValue);
-    onChangeTitle?.(newValue);
+    setLocalValue(e.target.value);
+  }
+
+  // persist when the user is no longer focued on the input field
+  function handleBlur() {
+    const trimmed = localValue.trim();
+
+    if (!trimmed) {
+      setLocalValue(value);
+      return;
+    }
+
+    if (trimmed === value) return;
+
+    handleEditProject(projectId, trimmed);
   }
 
   return (
     <input
       className='content-heading'
-      value={value}
+      value={localValue}
       onChange={handleChange}
+      onBlur={handleBlur}
+      maxLength={24}
     />
   );
 }

@@ -130,8 +130,8 @@ function ProjectCard({
     <div className='project-card' onClick={() => handleProject(project)}>
       <div className={`project-card-header ${project.isarchived ? "cross-out" : ""}`}>
         <span>{project.title}</span>
-        <i className={`bi ${project.ispinned ? "bi-pin-angle-fill" : ""}`}></i>
-        <i className={`bi ${project.isstarred ? "bi-star-fill" : ""}`}></i>
+        {project.ispinned && <i className="bi bi-pin-angle-fill"></i>}
+        {project.isstarred && <i className="bi bi-star-fill"></i>}
       </div>
       <div className={`project-card-footer ${project.isarchived ? "cross-out" : ""}`}>
         {len} notes 
