@@ -5,19 +5,21 @@ import './App.css'
 export default function App() {
   const [darkMode, setDarkMode] = useState(false);
 
-  function toggleTheme() {
-    const newMode = !darkMode;
+  function handleDarkMode(newMode) {
     setDarkMode(newMode);
+  }
+
+  useEffect(() => {
     document.documentElement.setAttribute(
       "data-theme",
-      newMode ? "light" : "dark"
+      darkMode ? "dark" : "light"
     );
-  }
-  
+  }, [darkMode]);
+
   return (
     <div className='app'>
       <ProjectsPanel />
-      <NotesPanel />
+      <NotesPanel darkMode={darkMode} handleDarkMode={handleDarkMode} />
     </div>
   );
 }
@@ -133,7 +135,7 @@ function ProjectCard({
   );
 }
 
-function NotesPanel() {
+function NotesPanel({darkMode, handleDarkMode}) {
   const filterOptions = ["All", "Pinned", "Starred", "Image", "Title", "Text", "Separator"];
   const sortOptions = ["Modified", "Created", "Custom"];
   const [sortDir, setSortDir] = useState(true);
@@ -141,7 +143,7 @@ function NotesPanel() {
   const handleSortDir = (value) =>{
     setSortDir(value);
   };
-
+  
   return (
     <div className='notes-panel'>
       <div className='content-header'>
@@ -155,6 +157,8 @@ function NotesPanel() {
           <i className='bi bi-dot'></i>
           <IconFillButton icon='archive' iconAlt='archive-fill' classList='content-button' />
           <IconFillButton icon='trash3' iconAlt='trash3-fill' classList='content-button' />
+          <div style={{flex: 1}}></div>
+          <ThemeButton darkMode={darkMode} handleDarkMode={handleDarkMode} />
         </div>
         <div className='flexrow content-subheader'>
           Created [ Jan 15, 2026 ] [ 36 days ago ] 
@@ -264,21 +268,20 @@ function Empty() {
   );
 }
 
-function ThemeButton({ darkMode, toggleTheme }) {
+function ThemeButton({ darkMode, handleDarkMode }) {
   const [hovered, setHovered] = useState(false);
   let iconClass = "bi bi-";
-  if (hovered) iconClass += darkMode ? "moon-fill" : "sun-fill";
-  else iconClass += darkMode ? "moon" : "sun";
+  if (hovered) iconClass += darkMode ? "sun-fill" : "moon-fill";
+  else iconClass += darkMode ? "sun" : "moon";
 
   return (
     <button
-      className='navbar-button'
-      onClick={toggleTheme}
+      className='content-button'
+      onClick={() => handleDarkMode(!darkMode)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       <i className={iconClass}></i>
-      <span>Theme</span>
     </button>
   );
 }

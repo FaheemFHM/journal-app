@@ -11,17 +11,6 @@
 :root {
   font-size: 14px;
   line-height: 1rem;
-
-  /* light theme */
-  --bg: #ffffff;
-  --surface: #fafafa;
-  --border: #eaeaea;
-
-  --text: #333333;
-  --text-muted: #64748b;
-
-  --primary: #00bb99;
-  --primary-hover: #00a385;
 }
 
 [data-theme="dark"] {
@@ -35,6 +24,19 @@
   
   --primary: #55ebd7; /* main brand colour */
   --primary-hover: #29c4af; /* hover brand colour */
+}
+
+[data-theme="light"] {
+  /* light theme */
+  --bg: #ffffff;
+  --surface: #f7f7f7;
+  --border: #e7e7e7;
+
+  --text: #333333;
+  --text-muted: #64748b;
+
+  --primary: #00bb99;
+  --primary-hover: #00a385;
 }
 
 body {
