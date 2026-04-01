@@ -183,13 +183,18 @@ export default function NotesPanel({
       </div>
 
       <div className='content-body'>
-        {filteredNotes.map(n => (
-          <NoteCard
-            key={n.id}
-            note={n}
-            text={highlightSearchTerms(n.text)}
-          />
-        ))}
+        {filteredNotes.length > 0 ? (
+          filteredNotes.map(n => (
+            <NoteCard
+              key={n.id}
+              note={n}
+              text={highlightSearchTerms(n.text)}
+            />
+          ))
+        ) : (
+          <div className="no-notes">Please create your first note below...</div>
+        )}
+        {}
       </div>
 
       <div className='content-footer'>

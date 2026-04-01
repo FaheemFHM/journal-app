@@ -105,6 +105,16 @@
   overflow-y: scroll;
 }
 
+.no-notes {
+  height: 100%;
+  width: 100%;
+  padding: 0 10%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
 .note-card {
   width: 100%;
 

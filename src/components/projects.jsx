@@ -98,15 +98,19 @@ export default function ProjectsPanel({
         </button>
       </div>
       <div className='projects-body'>
-        {filteredProjects.map(p => (
-          <ProjectCard
-            key={p.id}
-            project={p}
-            len={notesByProject[p.id] || 0}
-            mod={timeAgo(p.datetimemodified)}
-            handleProject={handleProject}
-          />
-        ))}
+        {filteredProjects.length > 0 ? (
+          filteredProjects.map(p => (
+            <ProjectCard
+              key={p.id}
+              project={p}
+              len={notesByProject[p.id] || 0}
+              mod={timeAgo(p.datetimemodified)}
+              handleProject={handleProject}
+            />
+          ))
+        ) : (
+          <div className="no-projects">Please create your first project below...</div>
+        )}
       </div>
       <div className='projects-footer'>
         <input type='text' placeholder='New project...'></input>
