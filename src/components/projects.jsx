@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import "./projects.css";
+import { timeAgo } from "../utils.js";
 
 import Dropdown from "./dropdown";
 
@@ -17,32 +18,7 @@ export default function ProjectsPanel({
 
   const filterOptions = ["All", "Pinned", "Starred", "Archived"];
   const sortOptions = ["Modified", "Created", "Size"];
-
-  function timeAgo(dateString) {
-    const now = new Date();
-    const past = new Date(dateString);
-    const diffMs = now - past;
-
-    const minutes = Math.floor(diffMs / (1000 * 60));
-    if (minutes < 1) return "Just now";
-    if (minutes < 60) return `${minutes}m`;
-
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h`;
-
-    const days = Math.floor(hours / 24);
-    if (days < 7) return `${days}d`;
-
-    const weeks = Math.floor(days / 7);
-    if (weeks < 52) return `${weeks}w`;
-
-    const months = Math.floor(days / 30);
-    if (months < 12) return `${months}y`;
-
-    const years = Math.floor(days / 365);
-    return `${years}y`;
-  }
-
+  
   return (
     <div className='projects-panel'>
       <div className='projects-header'>
@@ -105,7 +81,7 @@ function ProjectCard({
       <div className={`project-card-footer ${project.isarchived ? "cross-out" : ""}`}>
         {len} notes 
         <i className='bi bi-dot'></i> 
-        Modified {mod} ago
+        Modified {mod}
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import "./notes.css";
+import { timeAgo } from "../utils.js";
 
 import Dropdown from "./dropdown";
 
@@ -19,11 +20,31 @@ export default function NotesPanel({
     setSortDir(value);
   };
 
+  const handleChangeTitle = (newTitle) => {
+    setProject(prev => ({
+      ...prev,
+      title: newTitle
+    }));
+  };
+
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+
+    return date.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  }
+  
   return (
     <div className='notes-panel'>
       <div className='content-header'>
         <div className='flexrow content-heading-container'>
-          <ProjectTitleInput initValue={project.title}/>
+          <ProjectTitleInput
+            initValue={project.title}
+            onChangeTitle={handleChangeTitle}
+          />
           <div style={{flex: 1}}></div>
           <i className='bi bi-dot'></i>
           <IconFillButton
@@ -58,9 +79,11 @@ export default function NotesPanel({
         </div>
 
         <div className='flexrow content-subheader'>
-          Created [ Jan 15, 2026 ] [ 36 days ago ] 
+          Created [ {formatDate(project.datetimecreated)} ] 
+          [ {timeAgo(project.datetimecreated)} ] 
           <i className='bi bi-dot'></i> 
-          Modified [ Feb 27, 2026 ] [ 2 hours ago ]
+          Modified [ {formatDate(project.datetimemodified)} ] 
+          [ {timeAgo(project.datetimemodified)} ]
         </div>
 
         <div className='flexrow content-fss-labels'>
@@ -169,11 +192,27 @@ function IconFillButton({
   );
 }
 
-function ProjectTitleInput({initValue}) {
+function ProjectTitleInput({
+  initValue = "Empty Title",
+  onChangeTitle
+}) {
+  const [value, setValue] = useState(initValue);
+
+  useEffect(() => {
+    setValue(initValue);
+  }, [initValue]);
+
+  function handleChange(e) {
+    const newValue = e.target.value;
+    setValue(newValue);
+    onChangeTitle?.(newValue);
+  }
+
   return (
     <input
       className='content-heading'
-      value={initValue}>
-    </input>
+      value={value}
+      onChange={handleChange}
+    />
   );
 }
