@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import "./notes.css";
 import { timeAgo } from "../utils.js";
 
@@ -11,15 +11,57 @@ export default function NotesPanel({
   theme,
   handleThemeIndex
 }) {
-  const filterOptions = ["All", "Pinned", "Starred", "Image", "Title", "Text", "Separator"];
-  const sortOptions = ["Modified", "Created", "Custom"];
+  const filterOptions = ["All", "Pinned", "Starred"];
+  const sortOptions = ["Position", "Modified", "Created", "ID"];
 
-  const [sortDir, setSortDir] = useState(true);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState(filterOptions[0]);
+  const [sort, setSort] = useState(sortOptions[0]);
+  const [sortDir, setSortDir] = useState(true); // true is ascending
 
-  const handleSortDir = (value) =>{
-    setSortDir(value);
+  const filteredNotes = useMemo(() => {
+    return [...notes]
+    // search
+    .filter(n => {
+      if (!search.trim()) return true;
+      return n.text.toLowerCase().includes(search.toLowerCase());
+    })
+    // filter
+    .filter(n => {
+      if (filter === "All") return true;
+      if (filter === "Pinned") return n.ispinned;
+      if (filter === "Starred") return n.isstarred;
+      return true;
+    })
+    // sort
+    .sort((a, b) => {
+      let valA, valB;
+
+      if (sort === "Position") {
+        valA = a.position;
+        valB = b.position;
+      } else if (sort === "Modified") {
+        valA = new Date(a.datetimemodified);
+        valB = new Date(b.datetimemodified);
+      } else if (sort === "Created") {
+        valA = new Date(a.datetimecreated);
+        valB = new Date(b.datetimecreated);
+      } else if (sort === "ID") {
+        valA = a.id;
+        valB = b.id;
+      }
+      
+      return sortDir ? valA - valB : valB - valA;
+    });
+  }, [notes, search, filter, sort, sortDir]);
+
+  const resetFilters = () => {
+    setSearch("");
+    setFilter(filterOptions[0]);
+    setSort(sortOptions[0]);
+    setSortDir(true);
   };
-
+  
   const handleChangeTitle = (newTitle) => {
     setProject(prev => ({
       ...prev,
@@ -36,6 +78,21 @@ export default function NotesPanel({
       year: "numeric",
     });
   }
+
+  function highlightSearchTerms(noteText) {
+    if (!search) return noteText;
+
+    const regex = new RegExp(`(${search})`, "gi");
+    const parts = noteText.split(regex);
+
+    return parts.map((part, index) => 
+      part.toLowerCase() === search.toLowerCase() ? (
+        <span key={index} className="highlight">{part}</span>
+      ) : (
+        part
+      )
+    );
+  }
   
   return (
     <div className='notes-panel'>
@@ -45,7 +102,6 @@ export default function NotesPanel({
             initValue={project.title}
             onChangeTitle={handleChangeTitle}
           />
-          <div style={{flex: 1}}></div>
           <i className='bi bi-dot'></i>
           <IconFillButton
             icon='pin-angle'
@@ -87,33 +143,49 @@ export default function NotesPanel({
         </div>
 
         <div className='flexrow content-fss-labels'>
-          <div className='content-fss-label'>Search</div>
-          <div className='content-fss-label'>Filter</div>
-          <div className='content-fss-label'>Sort</div>
-          <button className='sort-toggle-notes' style={{visibility: 'hidden'}} ></button>
+          <div>Search</div>
+          <div>Filter</div>
+          <div>Sort</div>
         </div>
         
         <div className='flexrow content-fss'>
           <div className="search-box">
             <i className="bi bi-search"></i>
-            <input type="text" placeholder="Search notes..." />
+            <input
+              type="text"
+              placeholder="Search notes..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
-          <Dropdown options={filterOptions} />
-          <Dropdown options={sortOptions} />
+          <Dropdown
+            options={filterOptions}
+            value={filter}
+            onChange={setFilter}
+          />
+          <Dropdown
+            options={sortOptions}
+            value={sort}
+            onChange={setSort}
+          />
+        </div>
+
+        <div className="flexrow content-fss">
           <button
-            className='sort-toggle-notes'
-            onClick={() => handleSortDir(!sortDir)}
-          >
-            <i className={`bi bi-sort-${sortDir ? "up" : "down"}`}></i>
-          </button>
+            onClick={() => resetFilters()}
+          >Reset Filters</button>
+          <button
+            onClick={() => setSortDir(!sortDir)}
+          >{sortDir ? "Sort Descending" : "Sort Ascending"}</button>
         </div>
       </div>
 
       <div className='content-body'>
-        {notes.map(n => (
+        {filteredNotes.map(n => (
           <NoteCard
             key={n.id}
             note={n}
+            text={highlightSearchTerms(n.text)}
           />
         ))}
       </div>
@@ -127,14 +199,15 @@ export default function NotesPanel({
 }
 
 function NoteCard({
-  note
+  note,
+  text
 }) {
   return(
     <div className='note-card'>
       <button className='note-card-drag'>
         <i className='bi bi-grip-vertical'></i>
       </button>
-      <div className='note-card-text'>{note.text}</div>
+      <div className="note-card-text">{text}</div>
       <div className='note-card-reactions-container'>
         <div className='note-card-id'>{note.id}</div>
         <IconFillButton
