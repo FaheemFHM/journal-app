@@ -9,7 +9,9 @@ export default function NotesPanel({
   project,
   notes,
   theme,
-  handleThemeIndex
+  handleThemeIndex,
+  onToggleProject,
+  onToggleNote,
 }) {
   const filterOptions = ["All", "Pinned", "Starred"];
   const sortOptions = ["Position", "Modified", "Created", "ID"];
@@ -107,20 +109,23 @@ export default function NotesPanel({
             icon='pin-angle'
             iconAlt='pin-angle-fill'
             classList='content-button'
-            startActive={project.ispinned}
+            active={project.ispinned}
+            onToggle={() => onToggleProject(project.id, "ispinned")}
           />
           <IconFillButton
             icon='star'
             iconAlt='star-fill'
             classList='content-button'
-            startActive={project.isstarred}
+            active={project.isstarred}
+            onToggle={() => onToggleProject(project.id, "isstarred")}
           />
           <i className='bi bi-dot'></i>
           <IconFillButton
             icon='archive'
             iconAlt='archive-fill'
             classList='content-button'
-            startActive={project.isarchived}
+            active={project.isarchived}
+            onToggle={() => onToggleProject(project.id, "isarchived")}
           />
           <IconFillButton
             icon='trash3'
@@ -189,6 +194,7 @@ export default function NotesPanel({
               key={n.id}
               note={n}
               text={highlightSearchTerms(n.text)}
+              onToggleNote={onToggleNote}
             />
           ))
         ) : (
@@ -207,7 +213,8 @@ export default function NotesPanel({
 
 function NoteCard({
   note,
-  text
+  text,
+  onToggleNote,
 }) {
   return(
     <div className='note-card'>
@@ -221,13 +228,15 @@ function NoteCard({
           icon='pin-angle'
           iconAlt='pin-angle-fill'
           classList='note-card-reaction'
-          startActive={note.ispinned}
+          active={note.ispinned}
+          onToggle={() => onToggleNote(note.id, "ispinned")}
         />
         <IconFillButton
           icon='star'
           iconAlt='star-fill'
           classList='note-card-reaction'
-          startActive={note.isstarred}
+          active={note.isstarred}
+          onToggle={() => onToggleNote(note.id, "isstarred")}
         />
       </div>
     </div>
@@ -250,22 +259,11 @@ function ThemeButton({theme, handleThemeIndex}) {
   );
 }
 
-function IconFillButton({
-  icon = "star",
-  iconAlt = "starFill",
-  classList = "",
-  startActive = false,
-}) {
-  const [active, setActive] = useState(startActive);
-
-  useEffect(() => {
-    setActive(startActive);
-  }, [startActive]);
-
+function IconFillButton({ icon, iconAlt, classList, active, onToggle }) {
   return (
     <button
       className={`${classList} ${active ? 'active' : ''}`}
-      onClick={() => setActive(!active)}
+      onClick={onToggle}
     >
       <i className={`bi bi-${active ? iconAlt : icon}`}></i>
     </button>

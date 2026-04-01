@@ -58,7 +58,7 @@ export default function App() {
 
   const [project, setProject] = useState({});
 
-  // make all IDs numeric
+  // make all IDs numeric and select project
   function handleProject(newProject) {
     setProject({
       ...newProject,
@@ -113,6 +113,82 @@ export default function App() {
     return acc;
   }, {});
 
+  // ===  icon toggle handlers ===
+
+  function handleToggleProject(pId, field) {
+    const newDate = new Date().toISOString();
+
+    setProjects(prev => {
+      // get the new value
+      const prevState = [...prev];
+
+      const projectToUpdate = prevState.find(p => p.id === pId);
+      if (!projectToUpdate) return prev;
+
+      const newValue = !projectToUpdate[field];
+
+      // optimistic ui update
+      const newState = prev.map(p =>
+        p.id === pId
+          ? { ...p, [field]: newValue, datetimemodified: newDate }
+          : p
+      );
+
+      // backend update
+      fetch(`http://localhost:5000/projects/${pId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          [field]: newValue,
+          datetimemodified: newDate
+        })
+      }).catch(() => {
+        setProjects(prevState);
+      });
+
+      return newState;
+    });
+  }
+
+  function handleToggleNote(nId, field) {
+    const newDate = new Date().toISOString();
+
+    setNotes(prev => {
+      // get the new value
+      const prevState = [...prev];
+
+      const noteToUpdate = prevState.find(n => n.id === nId);
+      if (!noteToUpdate) return prev;
+
+      const newValue = !noteToUpdate[field];
+
+      // optimistic ui update
+      const newState = prev.map(n =>
+        n.id === nId
+          ? {
+              ...n,
+              [field]: newValue,
+              datetimemodified: newDate
+            }
+          : n
+      );
+
+      // backend update
+      fetch(`http://localhost:5000/notes/${nId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          [field]: newValue,
+          datetimemodified: newDate
+        })
+      }).catch(() => {
+        setNotes(prevState);
+      });
+
+      return newState;
+    });
+  }
+
   return (
     <div className='app'>
       <ProjectsPanel
@@ -125,6 +201,8 @@ export default function App() {
         notes={filteredNotes}
         theme={themes[nextThemeIndex()]}
         handleThemeIndex={handleThemeIndex}
+        onToggleProject={handleToggleProject}
+        onToggleNote={handleToggleNote}
       />
     </div>
   );
