@@ -19,17 +19,29 @@ export default function ProjectsPanel() {
   useEffect(() => {
     fetch("http://localhost:5000/notes")
       .then(res => res.json())
-      .then(setNotes)
+      .then(data => setNotes(data))
       .catch(console.error);
   }, []);
 
-  const filterOptions = ["All", "Pinned", "Starred", "Archived"];
-  const sortOptions = ["Modified", "Created", "Size"];
   const [sortDir, setSortDir] = useState(true);
 
   const handleSortDir = (value) =>{
     setSortDir(value);
   };
+
+  const filterOptions = ["All", "Pinned", "Starred", "Archived"];
+  const sortOptions = ["Modified", "Created", "Size"];
+  
+  // reduce takes an array and reduces it into a single value
+  // array.reduce((accumulator, currentValue) => { ... }, initialValue)
+  // acc: accumulator = iteration counter
+  // n: current element of array being processed
+  // reduce returns the final accumulator object
+  // acc has signature: {key=project_id, value=note_count}
+  const notesByProject = notes.reduce((acc, n) => {
+    acc[n.project_id] = (acc[n.project_id] || 0) + 1;
+    return acc;
+  }, {});
 
   function timeAgo(dateString) {
     const now = new Date();
@@ -55,7 +67,7 @@ export default function ProjectsPanel() {
     const years = Math.floor(days / 365);
     return `${years}y`;
   }
-  
+
   return (
     <div className='projects-panel'>
       <div className='projects-header'>
@@ -84,15 +96,15 @@ export default function ProjectsPanel() {
         </button>
       </div>
       <div className='projects-body'>
-        {projects.map(project => (
+        {projects.map(p => (
           <ProjectCard
-            key={project.id}
-            txt={project.title}
-            mod={timeAgo(project.datetimemodified)}
-            pin={project.ispinned}
-            fav={project.isstarred}
-            arch={project.isarchived}
-            len={notes.filter(n => n.project_id === project.id).length}
+            key={p.id}
+            txt={p.title}
+            mod={timeAgo(p.datetimemodified)}
+            pin={p.ispinned}
+            fav={p.isstarred}
+            arch={p.isarchived}
+            len={notesByProject[p.id] || 0}
           />
         ))}
       </div>
