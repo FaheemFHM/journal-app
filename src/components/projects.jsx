@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import "./projects.css";
 import { timeAgo } from "../utils.js";
 
@@ -12,11 +12,45 @@ export default function ProjectsPanel({
 }) {
   const filterOptions = ["All", "Pinned", "Starred", "Archived"];
   const sortOptions = ["Modified", "Created", "Size"];
-  
+
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState(filterOptions[0]);
   const [sort, setSort] = useState(sortOptions[0]);
-  const [sortDir, setSortDir] = useState(true);
+  const [sortDir, setSortDir] = useState(false); // start ascending
+
+  const filteredProjects = useMemo(() => {
+    return [...projects]
+    // search
+    .filter(p => {
+      if (!search.trim()) return true;
+      return p.title.toLowerCase().includes(search.toLowerCase());
+    })
+    // filter
+    .filter(p => {
+      if (filter === "All") return true;
+      if (filter === "Pinned") return p.ispinned;
+      if (filter === "Starred") return p.isstarred;
+      if (filter === "Archived") return p.isarchived;
+      return true;
+    })
+    // sort
+    .sort((a, b) => {
+      let valA, valB;
+
+      if (sort === "Modified") {
+        valA = new Date(a.datetimemodified);
+        valB = new Date(b.datetimemodified);
+      } else if (sort === "Created") {
+        valA = new Date(a.datetimecreated);
+        valB = new Date(b.datetimecreated);
+      } else if (sort === "Size") {
+        valB = notesByProject[a.id] || 0;
+        valA = notesByProject[b.id] || 0;
+      }
+      
+      return sortDir ? valA - valB : valB - valA;
+    });
+  }, [projects, search, filter, sort, sortDir, notesByProject]);
   
   return (
     <div className='projects-panel'>
@@ -51,7 +85,7 @@ export default function ProjectsPanel({
         </button>
       </div>
       <div className='projects-body'>
-        {projects.map(p => (
+        {filteredProjects.map(p => (
           <ProjectCard
             key={p.id}
             project={p}
