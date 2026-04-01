@@ -21,7 +21,7 @@ export default function App() {
   function handleThemeIndex(newIndex = null) {
     setThemeIndex(nextThemeIndex(newIndex));
   }
-  
+
   function nextThemeIndex(curIndex = null) {
     const t = curIndex || themeIndex;
     return (t + 1 + themes.length) % themes.length;
@@ -164,7 +164,7 @@ function NotesPanel({theme, handleThemeIndex}) {
   const handleSortDir = (value) =>{
     setSortDir(value);
   };
-
+  
   return (
     <div className='notes-panel'>
       <div className='content-header'>
