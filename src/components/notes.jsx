@@ -87,7 +87,6 @@ export default function NotesPanel({
             initValue={project.title}
             onChangeTitle={handleChangeTitle}
           />
-          <div style={{flex: 1}}></div>
           <i className='bi bi-dot'></i>
           <IconFillButton
             icon='pin-angle'
@@ -144,13 +143,16 @@ export default function NotesPanel({
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <Dropdown options={filterOptions} value={filter} onChange={setFilter} />
-          <Dropdown options={sortOptions} value={sort} onChange={setSort} />
-          {/* <button
-
-          >
-            <i className={`bi bi-sort-${sortDir ? "down" : "up"}`}></i>
-          </button> */}
+          <Dropdown
+            options={filterOptions}
+            value={filter}
+            onChange={setFilter}
+          />
+          <Dropdown
+            options={sortOptions}
+            value={sort}
+            onChange={setSort}
+          />
         </div>
 
         <div className="flexrow content-fss">
