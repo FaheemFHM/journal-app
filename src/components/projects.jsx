@@ -58,7 +58,7 @@ export default function ProjectsPanel({
     setSort(sortOptions[0]);
     setSortDir(false);
   };
-  
+    
   return (
     <div className='projects-panel'>
       <div className='projects-header'>

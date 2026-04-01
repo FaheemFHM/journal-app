@@ -6,6 +6,9 @@ import ProjectsPanel from "./components/projects";
 import NotesPanel from "./components/notes";
 
 export default function App() {
+
+  // === theme controls ===
+
   const [themeIndex, setThemeIndex] = useState(0);
 
   const themes = [
@@ -37,6 +40,8 @@ export default function App() {
     );
   }, [themeIndex]);
 
+  // === load full projects list ===
+
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
@@ -53,10 +58,7 @@ export default function App() {
 
   const [project, setProject] = useState({});
 
-  useEffect(() => {
-    setProject(projects[0] || {});
-  }, [projects]);
-
+  // make all IDs numeric
   function handleProject(newProject) {
     setProject({
       ...newProject,
@@ -64,12 +66,30 @@ export default function App() {
     });
   }
 
+  // set default project
+  useEffect(() => {
+    if (projects.length < 1) return;
+
+    const earliestProject = projects.reduce((earliest, prj) => {
+      const mod = new Date(prj.datetimemodified);
+      const old = new Date(earliest.datetimemodified);
+      return mod > old
+        ? prj
+        : earliest;
+    }, projects[0]); // start with first elem as earliest
+
+    setProject(earliestProject);
+  }, [projects]);
+
+  // === load full notes list ===
+
   const [notes, setNotes] = useState([]);
 
   useEffect(() => {
     fetch("http://localhost:5000/notes")
       .then(res => res.json())
       .then(data => setNotes(
+        // make all IDs numeric
         data.map(n => ({
           ...n,
           project_id: Number(n.project_id)

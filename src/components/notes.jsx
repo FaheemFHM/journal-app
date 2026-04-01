@@ -140,6 +140,8 @@ export default function NotesPanel({
           <i className='bi bi-dot'></i> 
           Modified [ {formatDate(project.datetimemodified)} ] 
           [ {timeAgo(project.datetimemodified)} ]
+          <i className='bi bi-dot'></i> 
+          {notes.length} notes
         </div>
 
         <div className='flexrow content-fss-labels'>
