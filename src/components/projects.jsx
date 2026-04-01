@@ -4,44 +4,19 @@ import "./projects.css";
 
 import Dropdown from "./dropdown";
 
-export default function ProjectsPanel() {
-  const [projects, setProjects] = useState([]);
-
-  useEffect(() => {
-    fetch("http://localhost:5000/projects")
-    .then(res => res.json())
-    .then(data => setProjects(data))
-    .catch(err => console.error(err))
-  }, []);
-
-  const [notes, setNotes] = useState([]);
-
-  useEffect(() => {
-    fetch("http://localhost:5000/notes")
-      .then(res => res.json())
-      .then(data => setNotes(data))
-      .catch(console.error);
-  }, []);
-
+export default function ProjectsPanel({
+  projects,
+  notesByProject,
+  handleProject
+}) {
   const [sortDir, setSortDir] = useState(true);
 
-  const handleSortDir = (value) =>{
+  const handleSortDir = (value) => {
     setSortDir(value);
   };
 
   const filterOptions = ["All", "Pinned", "Starred", "Archived"];
   const sortOptions = ["Modified", "Created", "Size"];
-  
-  // reduce takes an array and reduces it into a single value
-  // array.reduce((accumulator, currentValue) => { ... }, initialValue)
-  // acc: accumulator = iteration counter
-  // n: current element of array being processed
-  // reduce returns the final accumulator object
-  // acc has signature: {key=project_id, value=note_count}
-  const notesByProject = notes.reduce((acc, n) => {
-    acc[n.project_id] = (acc[n.project_id] || 0) + 1;
-    return acc;
-  }, {});
 
   function timeAgo(dateString) {
     const now = new Date();
@@ -99,12 +74,10 @@ export default function ProjectsPanel() {
         {projects.map(p => (
           <ProjectCard
             key={p.id}
-            txt={p.title}
-            mod={timeAgo(p.datetimemodified)}
-            pin={p.ispinned}
-            fav={p.isstarred}
-            arch={p.isarchived}
+            project={p}
             len={notesByProject[p.id] || 0}
+            mod={timeAgo(p.datetimemodified)}
+            handleProject={handleProject}
           />
         ))}
       </div>
@@ -117,21 +90,19 @@ export default function ProjectsPanel() {
 }
 
 function ProjectCard({
-  txt = "Empty Project Title",
-  len = 0,
-  mod = "never",
-  pin = 0,
-  fav = 0,
-  arch = 0
+  project,
+  len,
+  mod,
+  handleProject
 }) {
   return (
-    <div className='project-card'>
-      <div className={`project-card-header ${arch ? "cross-out" : ""}`}>
-        <span>{txt}</span>
-        <i className={`bi ${pin ? "bi-pin-angle-fill" : ""}`}></i>
-        <i className={`bi ${fav ? "bi-star-fill" : ""}`}></i>
+    <div className='project-card' onClick={() => handleProject(project)}>
+      <div className={`project-card-header ${project.isarchived ? "cross-out" : ""}`}>
+        <span>{project.title}</span>
+        <i className={`bi ${project.ispinned ? "bi-pin-angle-fill" : ""}`}></i>
+        <i className={`bi ${project.isstarred ? "bi-star-fill" : ""}`}></i>
       </div>
-      <div className={`project-card-footer ${arch ? "cross-out" : ""}`}>
+      <div className={`project-card-footer ${project.isarchived ? "cross-out" : ""}`}>
         {len} notes 
         <i className='bi bi-dot'></i> 
         Modified {mod} ago

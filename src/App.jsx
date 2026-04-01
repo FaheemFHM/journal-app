@@ -7,7 +7,7 @@ import NotesPanel from "./components/notes";
 
 export default function App() {
   const [themeIndex, setThemeIndex] = useState(0);
-  
+
   const themes = [
     {
       name: "light",
@@ -37,10 +37,72 @@ export default function App() {
     );
   }, [themeIndex]);
 
+  const [projects, setProjects] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/projects")
+    .then(res => res.json())
+    .then(data => setProjects(
+      data.map(n => ({
+        ...n,
+        id: Number(n.id)
+      }))
+    ))
+    .catch(err => console.error(err))
+  }, []);
+
+  const [project, setProject] = useState({});
+
+  useEffect(() => {
+    setProject(projects[0] || {});
+  }, [projects]);
+
+  function handleProject(newProject) {
+    setProject({
+      ...newProject,
+      id: Number(newProject.id)
+    });
+  }
+
+  const [notes, setNotes] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/notes")
+      .then(res => res.json())
+      .then(data => setNotes(
+        data.map(n => ({
+          ...n,
+          project_id: Number(n.project_id)
+        }))
+      ))
+      .catch(console.error);
+  }, []);
+
+  const filteredNotes = project?.id
+    ? notes.filter(n => n.project_id === project.id)
+    : [];
+
+  // reduce takes an array and reduces it into a single value
+  // array.reduce((accumulator, currentValue) => { ... }, initialValue)
+  // acc: accumulator = iteration counter
+  // n: current element of array being processed
+  // reduce returns the final accumulator object
+  // acc has signature: {key=project_id, value=note_count}
+  const notesByProject = notes.reduce((acc, n) => {
+    acc[n.project_id] = (acc[n.project_id] || 0) + 1;
+    return acc;
+  }, {});
+
   return (
     <div className='app'>
-      <ProjectsPanel />
+      <ProjectsPanel
+        projects={projects}
+        notesByProject={notesByProject}
+        handleProject={handleProject}
+      />
       <NotesPanel
+        project={project}
+        notes={filteredNotes}
         theme={themes[nextThemeIndex()]}
         handleThemeIndex={handleThemeIndex}
       />
