@@ -3,23 +3,43 @@ import { useState, useEffect, act } from 'react';
 import './App.css'
 
 export default function App() {
-  const [darkMode, setDarkMode] = useState(false);
+  const [themeIndex, setThemeIndex] = useState(0);
 
-  function handleDarkMode(newMode) {
-    setDarkMode(newMode);
+  const themes = [
+    {
+      name: "light",
+      icon: "sun",
+      iconAlt: "sun-fill",
+    },
+    {
+      name: "dark",
+      icon: "moon",
+      iconAlt: "moon-fill",
+    },
+  ];
+
+  function handleThemeIndex(newIndex = null) {
+    if (newIndex === null) {
+      setThemeIndex(prev => (prev + 1) % themes.length);
+    } else {
+      setThemeIndex((newIndex + themes.length) % themes.length);
+    }
   }
-
+  
   useEffect(() => {
     document.documentElement.setAttribute(
       "data-theme",
-      darkMode ? "dark" : "light"
+      themes[themeIndex].name
     );
-  }, [darkMode]);
+  }, [themeIndex]);
 
   return (
     <div className='app'>
       <ProjectsPanel />
-      <NotesPanel darkMode={darkMode} handleDarkMode={handleDarkMode} />
+      <NotesPanel
+        theme={themes[themeIndex]}
+        handleThemeIndex={handleThemeIndex}
+      />
     </div>
   );
 }
@@ -135,7 +155,7 @@ function ProjectCard({
   );
 }
 
-function NotesPanel({darkMode, handleDarkMode}) {
+function NotesPanel({theme, handleThemeIndex}) {
   const filterOptions = ["All", "Pinned", "Starred", "Image", "Title", "Text", "Separator"];
   const sortOptions = ["Modified", "Created", "Custom"];
   const [sortDir, setSortDir] = useState(true);
@@ -143,7 +163,7 @@ function NotesPanel({darkMode, handleDarkMode}) {
   const handleSortDir = (value) =>{
     setSortDir(value);
   };
-  
+
   return (
     <div className='notes-panel'>
       <div className='content-header'>
@@ -158,7 +178,10 @@ function NotesPanel({darkMode, handleDarkMode}) {
           <IconFillButton icon='archive' iconAlt='archive-fill' classList='content-button' />
           <IconFillButton icon='trash3' iconAlt='trash3-fill' classList='content-button' />
           <div style={{flex: 1}}></div>
-          <ThemeButton darkMode={darkMode} handleDarkMode={handleDarkMode} />
+          <ThemeButton
+            theme={theme}
+            handleThemeIndex={handleThemeIndex}
+          />
         </div>
         <div className='flexrow content-subheader'>
           Created [ Jan 15, 2026 ] [ 36 days ago ] 
@@ -268,16 +291,14 @@ function Empty() {
   );
 }
 
-function ThemeButton({ darkMode, handleDarkMode }) {
+function ThemeButton({theme, handleThemeIndex}) {
   const [hovered, setHovered] = useState(false);
-  let iconClass = "bi bi-";
-  if (hovered) iconClass += darkMode ? "sun-fill" : "moon-fill";
-  else iconClass += darkMode ? "sun" : "moon";
+  let iconClass = `bi bi-${hovered ? theme.iconAlt : theme.icon}`;
 
   return (
     <button
       className='content-button'
-      onClick={() => handleDarkMode(!darkMode)}
+      onClick={() => handleThemeIndex()}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
