@@ -202,7 +202,7 @@ export default function App() {
       if (!projectToUpdate) return prev;
       if (!trimmed) return prev;
       if (projectToUpdate.title === trimmed) return prev;
-      
+
       // update the project in the list/state
       const newState = prevState.map(p =>
         p.id === pId ? {
@@ -229,7 +229,64 @@ export default function App() {
   }
 
   function handleEditNote(nId, value) {
-    //
+    const newDate = new Date().toISOString();
+
+    setNotes(prev => {
+      const prevState = [...prev];
+      const noteToUpdate = prevState.find(n => n.id === nId);
+      const trimmed = value.trim();
+
+      if (!noteToUpdate) return prev;
+      if (!trimmed) return prev;
+      if (noteToUpdate.text === trimmed) return prev;
+
+      const projectId = noteToUpdate.project_id;
+      
+      const newState = prevState.map(n =>
+        n.id === nId
+          ? {
+              ...n,
+              text: trimmed,
+              datetimemodified: newDate
+            }
+          : n
+      );
+
+      // update project locally
+      setProjects(prevProjects =>
+        prevProjects.map(p =>
+          p.id === projectId
+            ? { ...p, datetimemodified: newDate }
+            : p
+        )
+      );
+
+      // update note backend
+      fetch(`http://localhost:5000/notes/${nId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: trimmed,
+          datetimemodified: newDate
+        })
+      }).catch((err) => {
+        setNotes(prevState);
+        console.error(err);
+      });
+      
+      // update project backend
+      fetch(`http://localhost:5000/projects/${projectId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          datetimemodified: newDate
+        })
+      }).catch((err) => {
+        console.error(err);
+      });
+
+      return newState;
+    });
   }
 
   return (
@@ -247,6 +304,7 @@ export default function App() {
         onToggleProject={handleToggleProject}
         onToggleNote={handleToggleNote}
         handleEditProject={handleEditProject}
+        handleEditNote={handleEditNote}
       />
     </div>
   );

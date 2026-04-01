@@ -79,12 +79,6 @@ input, textarea {
   outline: none;
 }
 
-textarea {
-  resize: vertical;
-  min-height: calc(1.25rem * 5);
-  max-height: 25vh;
-}
-
 input:focus,
 textarea:focus {
   border-color: var(--primary);

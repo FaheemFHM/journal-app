@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import "./notes.css";
 import { timeAgo } from "../utils.js";
 
@@ -13,6 +13,7 @@ export default function NotesPanel({
   onToggleProject,
   onToggleNote,
   handleEditProject,
+  handleEditNote,
 }) {
   const filterOptions = ["All", "Pinned", "Starred"];
   const sortOptions = ["Position", "Modified", "Created", "ID"];
@@ -190,6 +191,7 @@ export default function NotesPanel({
               note={n}
               text={highlightSearchTerms(n.text)}
               onToggleNote={onToggleNote}
+              onEditNote={handleEditNote}
             />
           ))
         ) : (
@@ -210,15 +212,84 @@ function NoteCard({
   note,
   text,
   onToggleNote,
+  onEditNote
 }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [localText, setLocalText] = useState(note.text);
+  const textareaRef = useRef(null);
+
+  // update local state
+  useEffect(() => {
+    setLocalText(note.text);
+  }, [note.text]);
+
+  // actually select/focus textarea
+  useEffect(() => {
+    if (isEditing && textareaRef.current) {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.focus(); // focus textarea
+    el.setSelectionRange(el.value.length, el.value.length); // cursor to end
+    autoResize();
+    }
+  }, [isEditing]);
+
+  function autoResize() {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto"; // reset
+    el.style.height = el.scrollHeight + "px"; // grow to fit content
+  }
+
+  function handleSave() {
+    const trimmed = localText.trim();
+
+    if (!trimmed || trimmed === note.text) {
+      setIsEditing(false);
+      setLocalText(note.text);
+      return;
+    }
+
+    onEditNote(note.id, trimmed);
+    setIsEditing(false);
+  }
+
   return(
     <div className='note-card'>
       <button className='note-card-drag'>
         <i className='bi bi-grip-vertical'></i>
       </button>
-      <div className="note-card-text">{text}</div>
+
+      {
+        isEditing ? (
+          <textarea
+            ref={textareaRef}
+            className="note-card-textarea"
+            value={localText}
+            onChange={(e) => {
+              setLocalText(e.target.value);
+              autoResize();
+            }}
+            onBlur={() => handleSave()}
+            onKeyDown={e => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                e.target.blur();
+              }
+            }}
+          ></textarea>
+        ) : (
+          <div
+            className="note-card-text"
+            onClick={() => setIsEditing(true)}
+          >{text}</div>
+        )
+      }
+
       <div className='note-card-reactions-container'>
-        <div className='note-card-id'>{note.id}</div>
+        <div className='note-card-id'>
+          {note.id}
+        </div>
         <IconFillButton
           icon='pin-angle'
           iconAlt='pin-angle-fill'
@@ -303,6 +374,12 @@ function ProjectTitleInput({
       onChange={handleChange}
       onBlur={handleBlur}
       maxLength={24}
+      onKeyDown={e => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          e.target.blur();
+        }
+      }}
     />
   );
 }
