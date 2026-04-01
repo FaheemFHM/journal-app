@@ -16,7 +16,7 @@ export default function ProjectsPanel({
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState(filterOptions[0]);
   const [sort, setSort] = useState(sortOptions[0]);
-  const [sortDir, setSortDir] = useState(false); // start ascending
+  const [sortDir, setSortDir] = useState(false);
 
   const filteredProjects = useMemo(() => {
     return [...projects]
@@ -51,6 +51,13 @@ export default function ProjectsPanel({
       return sortDir ? valA - valB : valB - valA;
     });
   }, [projects, search, filter, sort, sortDir, notesByProject]);
+
+  const resetFilters = () => {
+    setSearch("");
+    setFilter(filterOptions[0]);
+    setSort(sortOptions[0]);
+    setSortDir(false);
+  };
   
   return (
     <div className='projects-panel'>
@@ -82,6 +89,12 @@ export default function ProjectsPanel({
           onClick={() => setSortDir(!sortDir)}
         >
           Sort {sortDir ? "Ascending" : "Descending"}
+        </button>
+        <button
+          className='sort-toggle-projects'
+          onClick={() => resetFilters()}
+        >
+          Reset Filters
         </button>
       </div>
       <div className='projects-body'>
