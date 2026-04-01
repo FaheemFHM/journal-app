@@ -1,5 +1,5 @@
 
-import { useState, useEffect, act } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 
 import ProjectsPanel from "./components/projects";
@@ -7,7 +7,7 @@ import NotesPanel from "./components/notes";
 
 export default function App() {
   const [themeIndex, setThemeIndex] = useState(0);
-
+  
   const themes = [
     {
       name: "light",
@@ -20,7 +20,7 @@ export default function App() {
       iconAlt: "moon-fill",
     },
   ];
-
+  
   function handleThemeIndex(newIndex = null) {
     setThemeIndex(nextThemeIndex(newIndex));
   }

@@ -1,4 +1,5 @@
 
+import os
 import json
 import random
 from datetime import datetime, timedelta
@@ -35,61 +36,56 @@ def main():
   def random_bool(weight=0.5):
       return random.random() < weight
 
-  def random_date(start=datetime(2026, 1, 1, 9, 0, 0)):
-      return start + timedelta(minutes=random.randint(0, 1000))
-
-  def iso(dt):
-      return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+  def random_recent_datetime(max_days=7):
+      delta = timedelta(
+          days = 0 if random_bool(0.15) else random.randint(0, max_days),
+          hours = 0 if random_bool(0.35) else random.randint(0, 23),
+          minutes = 0 if random_bool(0.5) else random.randint(0, 59)
+      )
+      return (datetime.utcnow() - delta).isoformat(timespec="milliseconds") + "Z"
 
   # ===== values =====
 
   num_projects = get_user_input("Project count: ", 20)
   min_notes = get_user_input("Note count min: ", 3)
   max_notes = get_user_input("Note count max: ", 70)
-
+  
   projects = []
   notes = []
 
   note_id = 1
 
   # ===== generate projects =====
-
   for project_id in range(1, num_projects + 1):
-      created = random_date()
-      modified = created + timedelta(minutes=random.randint(10, 500))
+    project = {
+        "id": project_id,
+        "title": random_project(),
+        "datetimecreated": random_recent_datetime(59),
+        "datetimemodified": random_recent_datetime(14),
+        "ispinned": random_bool(0.2),
+        "isstarred": random_bool(0.3),
+        "isarchived": random_bool(0.1)
+    }
+    projects.append(project)
 
-      project = {
-          "id": project_id,
-          "title": random_project(),
-          "datetimecreated": iso(created),
-          "datetimemodified": iso(modified),
-          "ispinned": random_bool(0.2),
-          "isstarred": random_bool(0.3),
-          "isarchived": random_bool(0.1)
+    # ===== generate notes per project =====
+
+    num_notes = random.randint(min_notes, max_notes)
+
+    for i in range(num_notes):
+      note = {
+          "id": note_id,
+          "project_id": project_id,
+          "text": random_note(),
+          "position": float(i + 1),
+          "datetimecreated": random_recent_datetime(59),
+          "datetimemodified": random_recent_datetime(14),
+          "ispinned": random_bool(0.1),
+          "isstarred": random_bool(0.2)
       }
-      projects.append(project)
+      notes.append(note)
+      note_id += 1
 
-      # ===== generate notes per project =====
-
-      num_notes = random.randint(min_notes, max_notes)
-
-      for i in range(num_notes):
-          n_created = created + timedelta(minutes=i * 5)
-          n_modified = n_created + timedelta(minutes=random.randint(1, 60))
-
-          note = {
-              "id": note_id,
-              "project_id": project_id,
-              "text": random_note(),
-              "position": float(i + 1),
-              "datetimecreated": iso(n_created),
-              "datetimemodified": iso(n_modified),
-              "ispinned": random_bool(0.1),
-              "isstarred": random_bool(0.2)
-          }
-          notes.append(note)
-          note_id += 1
-          
   data = {
       "projects": projects,
       "notes": notes
@@ -99,14 +95,22 @@ def main():
 
   OUTPUT_FILE = "db.json"
 
-  with open(OUTPUT_FILE, "w") as f:
+  tmp_file = OUTPUT_FILE + ".tmp"
+  with open(tmp_file, "w", encoding="utf-8") as f:
       json.dump(data, f, indent=2)
-      
-  print("\n=======\n")
-  print(f"{len(projects)} Projects")
-  print(f"{len(notes)} Notes")
-  print(f"File: {OUTPUT_FILE}")
-  print("\n=======\n")
+  os.replace(tmp_file, OUTPUT_FILE)
+
+  with open(OUTPUT_FILE) as f:
+      try:
+          json.load(f)
+          print("\n=======\n")
+          print(f"{len(projects)} Projects")
+          print(f"{len(notes)} Notes")
+          print(f"File: {OUTPUT_FILE}")
+          print("\n=======\n")
+          
+      except json.JSONDecodeError as e:
+          print("JSON invalid:", e)
 
   input("Press ENTER to quit... ")
 

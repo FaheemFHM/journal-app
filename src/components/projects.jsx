@@ -5,6 +5,24 @@ import "./projects.css";
 import Dropdown from "./dropdown";
 
 export default function ProjectsPanel() {
+  const [projects, setProjects] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/projects")
+    .then(res => res.json())
+    .then(data => setProjects(data))
+    .catch(err => console.error(err))
+  }, []);
+
+  const [notes, setNotes] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/notes")
+      .then(res => res.json())
+      .then(setNotes)
+      .catch(console.error);
+  }, []);
+
   const filterOptions = ["All", "Pinned", "Starred", "Archived"];
   const sortOptions = ["Modified", "Created", "Size"];
   const [sortDir, setSortDir] = useState(true);
@@ -13,6 +31,31 @@ export default function ProjectsPanel() {
     setSortDir(value);
   };
 
+  function timeAgo(dateString) {
+    const now = new Date();
+    const past = new Date(dateString);
+    const diffMs = now - past;
+
+    const minutes = Math.floor(diffMs / (1000 * 60));
+    if (minutes < 1) return "Just now";
+    if (minutes < 60) return `${minutes}m`;
+
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h`;
+
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days}d`;
+
+    const weeks = Math.floor(days / 7);
+    if (weeks < 52) return `${weeks}w`;
+
+    const months = Math.floor(days / 30);
+    if (months < 12) return `${months}y`;
+
+    const years = Math.floor(days / 365);
+    return `${years}y`;
+  }
+  
   return (
     <div className='projects-panel'>
       <div className='projects-header'>
@@ -41,8 +84,16 @@ export default function ProjectsPanel() {
         </button>
       </div>
       <div className='projects-body'>
-        {Array.from({length: 40}).map((_, index) => (
-          <ProjectCard key={index} />
+        {projects.map(project => (
+          <ProjectCard
+            key={project.id}
+            txt={project.title}
+            mod={timeAgo(project.datetimemodified)}
+            pin={project.ispinned}
+            fav={project.isstarred}
+            arch={project.isarchived}
+            len={notes.filter(n => n.project_id === project.id).length}
+          />
         ))}
       </div>
       <div className='projects-footer'>
@@ -54,12 +105,12 @@ export default function ProjectsPanel() {
 }
 
 function ProjectCard({
-  txt = "My Project Title",
+  txt = "Empty Project Title",
   len = 0,
-  mod = "2h",
-  pin = Math.random() < 0.2,
-  fav = Math.random() < 0.4,
-  arch = Math.random() < 0.2
+  mod = "never",
+  pin = 0,
+  fav = 0,
+  arch = 0
 }) {
   return (
     <div className='project-card'>
