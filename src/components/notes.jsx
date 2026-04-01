@@ -129,10 +129,9 @@ export default function NotesPanel({
         </div>
 
         <div className='flexrow content-fss-labels'>
-          <div className='content-fss-label'>Search</div>
-          <div className='content-fss-label'>Filter</div>
-          <div className='content-fss-label'>Sort</div>
-          <button className='sort-toggle-notes' style={{visibility: 'hidden'}} ></button>
+          <div>Search</div>
+          <div>Filter</div>
+          <div>Sort</div>
         </div>
         
         <div className='flexrow content-fss'>
@@ -147,12 +146,20 @@ export default function NotesPanel({
           </div>
           <Dropdown options={filterOptions} value={filter} onChange={setFilter} />
           <Dropdown options={sortOptions} value={sort} onChange={setSort} />
-          <button
-            className='sort-toggle-notes'
-            onClick={() => setSortDir(!sortDir)}
+          {/* <button
+
           >
             <i className={`bi bi-sort-${sortDir ? "down" : "up"}`}></i>
-          </button>
+          </button> */}
+        </div>
+
+        <div className="flexrow content-fss">
+          <button
+            onClick={() => resetFilters()}
+          >Reset Filters</button>
+          <button
+            onClick={() => setSortDir(!sortDir)}
+          >{sortDir ? "Sort Descending" : "Sort Ascending"}</button>
         </div>
       </div>
 

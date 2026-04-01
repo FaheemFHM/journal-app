@@ -14,9 +14,12 @@
 
 .content-header {
   width: 100%;
-  padding: 0.5rem 0;
+  padding-top: 0.5rem;
   display: flex;
   flex-direction: column;
+
+  border-bottom: 3px solid var(--border);
+  margin-bottom: 0.75rem;
 }
 
 .content-heading-container {
@@ -57,21 +60,23 @@
   color: var(--text-muted);
   gap: 0.5rem;
 
-  padding: 0.75rem 1.25rem 0.2rem 0;
+  padding: 0.75rem 0 0.2rem 0;
   border-top: 1px solid var(--border);
   margin-top: 0.75rem;
 }
 
-.content-fss-label {
+.content-fss-labels div {
   width: 100%;
 }
 
 .content-fss{
   gap: 0.5rem;
-
   padding-bottom: 0.75rem;
-  border-bottom: 3px solid var(--border);
-  margin-bottom: 0.75rem;
+}
+
+.content-fss button {
+  width: 100%;
+  padding: 0.4rem;
 }
 
 .content-header .search-box input {
@@ -84,11 +89,6 @@
 
 .content-header .dropdown-button:hover {
   background-color: var(--border);
-}
-
-.sort-toggle-notes {
-  height: 100%;
-  aspect-ratio: 1 / 1;
 }
 
 /* ======================== CONTENT BODY ======================== */
