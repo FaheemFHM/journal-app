@@ -10,14 +10,13 @@ export default function ProjectsPanel({
   notesByProject,
   handleProject
 }) {
-  const [sortDir, setSortDir] = useState(true);
-
-  const handleSortDir = (value) => {
-    setSortDir(value);
-  };
-
   const filterOptions = ["All", "Pinned", "Starred", "Archived"];
   const sortOptions = ["Modified", "Created", "Size"];
+  
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState(filterOptions[0]);
+  const [sort, setSort] = useState(sortOptions[0]);
+  const [sortDir, setSortDir] = useState(true);
   
   return (
     <div className='projects-panel'>
@@ -26,22 +25,27 @@ export default function ProjectsPanel({
 
         <div className="search-box">
           <i className="bi bi-search"></i>
-          <input type="text" placeholder="Search projects..." />
+          <input
+            type="text"
+            placeholder="Search projects..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
 
         <div className='fss-container'>
           <div className='fss-box'>
             <div className='fss-label'>Filter</div>
-            <Dropdown options={filterOptions} />
+            <Dropdown options={filterOptions} value={filter} onChange={setFilter} />
           </div>
           <div className='fss-box'>
             <div className='fss-label'>Sort</div>
-            <Dropdown options={sortOptions} />
+            <Dropdown options={sortOptions} value={sort} onChange={setSort} />
           </div>
         </div>
         <button
           className='sort-toggle-projects'
-          onClick={() => handleSortDir(!sortDir)}
+          onClick={() => setSortDir(!sortDir)}
         >
           Sort {sortDir ? "Ascending" : "Descending"}
         </button>
