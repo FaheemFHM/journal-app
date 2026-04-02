@@ -289,6 +289,47 @@ export default function App() {
     });
   }
 
+  function handleDeleteNote(nId) {
+    if (!window.confirm(
+      `Are you sure you would like to delete note ${nId}?`
+    )) return;
+
+    const newDate = new Date().toISOString();
+
+    setNotes(prevNotes => {
+      // get note to delete
+      const noteToDelete = prevNotes.find(n => n.id === nId);
+      if (!noteToDelete) return prevNotes;
+      const projectId = noteToDelete.project_id;
+
+      // get notes list without the note to delete
+      const newNotes = prevNotes.filter(n => n.id !== nId);
+
+      // update project locally
+      setProjects(prevProjects =>
+        prevProjects.map(p =>
+          p.id === projectId ? { ...p, datetimemodified: newDate } : p
+        )
+      );
+
+      // delete note on backend
+      fetch(`http://localhost:5000/notes/${nId}`, { method: "DELETE" })
+        .catch(err => {
+          console.error(err);
+          setNotes(prevNotes);
+        });
+
+      // patch project backend
+      fetch(`http://localhost:5000/projects/${projectId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ datetimemodified: newDate })
+      }).catch(err => console.error(err));
+
+      return newNotes;
+    });
+  }
+  
   return (
     <div className='app'>
       <ProjectsPanel
@@ -305,6 +346,7 @@ export default function App() {
         onToggleNote={handleToggleNote}
         handleEditProject={handleEditProject}
         handleEditNote={handleEditNote}
+        handleDeleteNote={handleDeleteNote}
       />
     </div>
   );

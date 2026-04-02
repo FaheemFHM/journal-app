@@ -188,7 +188,7 @@
 
 .note-card-reactions-container {
   height: 100%;
-  min-height: 6rem;
+  min-height: 4rem;
 
   border-left: 1px solid var(--border);
 
@@ -218,19 +218,17 @@
   padding: 0 0.5rem;
 }
 
-.note-card-reaction {
+.note-card-reaction i {
   opacity: 0;
-  display: none;
+  /* transition: opacity 0.1s ease; */
 }
 
-.note-card:hover .note-card-reaction {
+.note-card:hover .note-card-reaction i {
   opacity: 1;
-  display: block;
 }
 
-.note-card-reaction.active {
+.note-card-reaction i.active {
   opacity: 1;
-  display: block;
 }
 
 /* ======================== CONTENT FOOTER ======================== */

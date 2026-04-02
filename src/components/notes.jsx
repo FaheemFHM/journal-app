@@ -14,6 +14,7 @@ export default function NotesPanel({
   onToggleNote,
   handleEditProject,
   handleEditNote,
+  handleDeleteNote,
 }) {
   const filterOptions = ["All", "Pinned", "Starred"];
   const sortOptions = ["Position", "Modified", "Created", "ID"];
@@ -192,6 +193,7 @@ export default function NotesPanel({
               text={highlightSearchTerms(n.text)}
               onToggleNote={onToggleNote}
               onEditNote={handleEditNote}
+              onDeleteNote={handleDeleteNote}
             />
           ))
         ) : (
@@ -212,7 +214,8 @@ function NoteCard({
   note,
   text,
   onToggleNote,
-  onEditNote
+  onEditNote,
+  onDeleteNote,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [localText, setLocalText] = useState(note.text);
@@ -287,9 +290,6 @@ function NoteCard({
       }
 
       <div className='note-card-reactions-container'>
-        <div className='note-card-id'>
-          {note.id}
-        </div>
         <IconFillButton
           icon='pin-angle'
           iconAlt='pin-angle-fill'
@@ -303,6 +303,19 @@ function NoteCard({
           classList='note-card-reaction'
           active={note.isstarred}
           onToggle={() => onToggleNote(note.id, "isstarred")}
+        />
+      </div>
+
+      <div className='note-card-reactions-container'>
+        <div className='note-card-id'>
+          {note.id}
+        </div>
+        <IconFillButton
+          icon='trash3'
+          iconAlt='trash3-fill'
+          classList='note-card-reaction'
+          active={false}
+          onToggle={() => onDeleteNote(note.id)}
         />
       </div>
     </div>
@@ -331,7 +344,7 @@ function IconFillButton({ icon, iconAlt, classList, active, onToggle }) {
       className={`${classList} ${active ? 'active' : ''}`}
       onClick={onToggle}
     >
-      <i className={`bi bi-${active ? iconAlt : icon}`}></i>
+      <i className={`bi bi-${active ? iconAlt : icon} ${active ? 'active' : ''}`}></i>
     </button>
   );
 }
