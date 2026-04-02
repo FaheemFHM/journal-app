@@ -150,19 +150,21 @@
   font-size: 1rem;
   line-height: 1.25rem;
 
+  border: 3px solid var(--bg);
+  border-radius: 0;
+  
   cursor: pointer;
-
-  white-space: pre-wrap; /* preserve \n as line breaks */
+  white-space: pre-wrap;
 }
 
 .note-card-textarea {
   flex: 1;
   padding: 0.5rem 0.75rem;
-
+  
   font-size: 1rem;
   line-height: 1.25rem;
   
-  border: none;
+  border: 3px solid var(--primary);
   border-radius: 0;
   
   background-color: var(--bg);
@@ -174,12 +176,14 @@
   overflow-y: hidden;
 }
 
-.note-card-textarea:hover, .note-card-text:hover {
+.note-card-text:hover {
   background-color: var(--surface);
+  border: 3px solid var(--surface)
 }
 
-.note-card-textarea:focus {
-  background-color: var(--primary);
+.note-card-textarea:hover {
+  background-color: var(--surface);
+  border: 3px solid var(--primary);
 }
 
 .highlight {

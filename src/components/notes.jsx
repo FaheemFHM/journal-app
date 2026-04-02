@@ -14,6 +14,7 @@ export default function NotesPanel({
   onToggleNote,
   handleEditProject,
   handleEditNote,
+  handleDeleteProject,
   handleDeleteNote,
 }) {
   const filterOptions = ["All", "Pinned", "Starred"];
@@ -128,6 +129,8 @@ export default function NotesPanel({
             icon='trash3'
             iconAlt='trash3-fill'
             classList='content-button'
+            active={false}
+            onToggle={() => handleDeleteProject(project.id)}
           />
           <i className='bi bi-dot'></i>
           <ThemeButton
@@ -241,9 +244,9 @@ function NoteCard({
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = "auto"; // reset
-    el.style.height = el.scrollHeight + "px"; // grow to fit content
+    el.style.height = (el.scrollHeight + 5.5) + "px"; // grow to fit content
   }
-
+  
   function handleSave() {
     const trimmed = localText.trim();
 

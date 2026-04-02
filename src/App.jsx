@@ -330,6 +330,12 @@ export default function App() {
     });
   }
   
+  function handleDeleteProject(pId) {
+    if (!window.confirm(
+      `Are you sure you would like to delete project ${pId}?`
+    )) return;
+  }
+
   return (
     <div className='app'>
       <ProjectsPanel
@@ -346,6 +352,7 @@ export default function App() {
         onToggleNote={handleToggleNote}
         handleEditProject={handleEditProject}
         handleEditNote={handleEditNote}
+        handleDeleteProject={handleDeleteProject}
         handleDeleteNote={handleDeleteNote}
       />
     </div>
