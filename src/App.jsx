@@ -330,10 +330,39 @@ export default function App() {
     });
   }
   
-  function handleDeleteProject(pId) {
+  function handleSoftDeleteProject(pId) {
     if (!window.confirm(
-      `Are you sure you would like to delete project ${pId}?`
+      `Are you sure you would like to delete project ${pId}?\n\nThis will also remove all notes in this project.`
     )) return;
+
+    const newDate = new Date().toISOString();
+
+    setProjects(prevProjects => {
+      // find project to delete
+      const pToDelete = prevProjects.find(p => p.id === pId);
+      if (!pToDelete) return prevProjects;
+
+      // store previous state
+      const prevProjectsState = [...prevProjects];
+
+      // update local state
+      const newProjects = prevProjects.filter(p => p.id !== pId);
+
+      // send backend request (soft delete)
+      fetch(`http://localhost:5000/projects/${pId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          isdeleted: true,
+          datetimedeleted: newDate
+        })
+      }).catch(err => {
+        console.error(err);
+        setProjects(prevProjectsState);
+      });
+
+      return newProjects;
+    });
   }
 
   return (
@@ -352,7 +381,7 @@ export default function App() {
         onToggleNote={handleToggleNote}
         handleEditProject={handleEditProject}
         handleEditNote={handleEditNote}
-        handleDeleteProject={handleDeleteProject}
+        handleDeleteProject={handleSoftDeleteProject}
         handleDeleteNote={handleDeleteNote}
       />
     </div>

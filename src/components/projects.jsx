@@ -10,7 +10,7 @@ export default function ProjectsPanel({
   notesByProject,
   handleProject
 }) {
-  const filterOptions = ["All", "Pinned", "Starred", "Archived"];
+  const filterOptions = ["All", "Pinned", "Starred", "Archived", "Deleted"];
   const sortOptions = ["Modified", "Created", "Size"];
 
   const [search, setSearch] = useState("");
@@ -27,10 +27,11 @@ export default function ProjectsPanel({
     })
     // filter
     .filter(p => {
-      if (filter === "All") return true;
+      if (filter === "All") return !p.isdeleted;
       if (filter === "Pinned") return p.ispinned;
       if (filter === "Starred") return p.isstarred;
       if (filter === "Archived") return p.isarchived;
+      if (filter === "Deleted") return p.isdeleted;
       return true;
     })
     // sort
