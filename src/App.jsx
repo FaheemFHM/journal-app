@@ -5,6 +5,8 @@ import './App.css';
 import ProjectsPanel from "./components/projects";
 import NotesPanel from "./components/notes";
 
+import {isExpired} from "./utils";
+
 export default function App() {
 
   // === theme controls ===
@@ -374,6 +376,44 @@ export default function App() {
     });
   }
 
+  const gracePeriodDays = 3;
+
+  function deleteAllExpiredProjects() {
+    if (projects.length < 1) return;
+    setProjects(prevProjects => {
+      // store previous state
+      const prevProjectsState = [...prevProjects];
+
+      // find projects that have expired
+      const expiredProjects = prevProjects.filter(p => 
+        p.isdeleted && isExpired(p.datetimedeleted, gracePeriodDays)
+      );
+      
+      // update local state immediately
+      const newProjects = prevProjects.filter(
+        p => !isExpired(p.datetimedeleted, gracePeriodDays)
+      );
+
+      // send backend delete requests for each expired project
+      expiredProjects.forEach(p => {
+        fetch(`http://localhost:5000/projects/${p.id}`, {
+          method: "DELETE"
+        }).catch(err => {
+          console.error(err);
+          setProjects(prevProjectsState);
+        });
+      });
+
+      return newProjects;
+    });
+  }
+
+  // useEffect(() => {
+  //   if (projects.length > 0) {
+  //     deleteAllExpiredProjects();
+  //   }
+  // }, [projects]);
+
   function handleRestoreProject(pId) {
     setProjects(prevProjects => {
       const prevProjectsState = [...prevProjects];
@@ -414,8 +454,6 @@ export default function App() {
 
     return () => clearInterval(interval);
   }, []);
-
-  const gracePeriodDays = 3;
 
   return (
     <div className='app'>
