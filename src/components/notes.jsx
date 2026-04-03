@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import "./notes.css";
-import { timeAgo } from "../utils.js";
+import { timeAgo, getGracePeriod } from "../utils.js";
 
 import Dropdown from "./dropdown";
 
@@ -17,6 +17,8 @@ export default function NotesPanel({
   handleDeleteProject,
   handleDeleteNote,
   handleRestoreProject,
+  timer,
+  gracePeriodDays,
 }) {
   const filterOptions = ["All", "Pinned", "Starred"];
   const sortOptions = ["Position", "Modified", "Created"];
@@ -152,6 +154,23 @@ export default function NotesPanel({
             handleThemeIndex={handleThemeIndex}
           />
         </div>
+
+        {
+          project.isdeleted ?
+          (
+            <div className='flexrow'>
+              <div className="content-grace-period">
+              Time to deletion = {
+                getGracePeriod(
+                  project.datetimedeleted,
+                  gracePeriodDays,
+                  timer
+                )
+              }
+              </div>
+            </div>
+          ) : (<></>)
+        }
 
         <div className='flexrow content-subheader'>
           Created [ {formatDate(project.datetimecreated)} ] 

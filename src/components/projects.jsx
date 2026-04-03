@@ -1,14 +1,16 @@
 
 import { useState, useEffect, useMemo } from "react";
 import "./projects.css";
-import { timeAgo } from "../utils.js";
+import { timeAgo, getGracePeriod } from "../utils.js";
 
 import Dropdown from "./dropdown";
 
 export default function ProjectsPanel({
   projects,
   notesByProject,
-  handleProject
+  handleProject,
+  timer,
+  gracePeriodDays,
 }) {
   const filterOptions = ["All", "Pinned", "Starred", "Archived", "Deleted"];
   const sortOptions = ["Modified", "Created", "Size"];
@@ -108,6 +110,8 @@ export default function ProjectsPanel({
               len={notesByProject[p.id] || 0}
               mod={timeAgo(p.datetimemodified)}
               handleProject={handleProject}
+              timer={timer}
+              gracePeriodDays={gracePeriodDays}
             />
           ))
         ) : (
@@ -132,8 +136,16 @@ function ProjectCard({
   project,
   len,
   mod,
-  handleProject
+  handleProject,
+  timer,
+  gracePeriodDays,
 }) {
+  const timeLeft = getGracePeriod(
+    project.datetimedeleted,
+    gracePeriodDays,
+    timer
+  );
+
   return (
     <div className='project-card' onClick={() => handleProject(project)}>
       <div className={`project-card-header ${project.isarchived ? "cross-out" : ""}`}>
@@ -141,11 +153,21 @@ function ProjectCard({
         {project.ispinned && <i className="bi bi-pin-angle-fill"></i>}
         {project.isstarred && <i className="bi bi-star-fill"></i>}
       </div>
-      <div className={`project-card-footer ${project.isarchived ? "cross-out" : ""}`}>
-        {len} notes 
-        <i className='bi bi-dot'></i> 
-        Modified {mod}
-      </div>
+      {
+        project.isdeleted ?
+        (
+          <div className="project-card-footer">
+            Grace Period = {timeLeft}
+          </div>
+        ) :
+        (
+          <div className={`project-card-footer ${project.isarchived ? "cross-out" : ""}`}>
+            {len} notes 
+            <i className='bi bi-dot'></i> 
+            Modified {mod}
+          </div>
+        )
+      }
     </div>
   );
 }

@@ -356,7 +356,7 @@ export default function App() {
             }
           : p
       );
-      
+
       // send backend request (soft delete)
       fetch(`http://localhost:5000/projects/${pId}`, {
         method: "PATCH",
@@ -404,12 +404,27 @@ export default function App() {
     });
   }
 
+  // global timer
+  const [timer, setTimer] = useState(Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimer(Date.now());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const gracePeriodDays = 3;
+
   return (
     <div className='app'>
       <ProjectsPanel
         projects={projects}
         notesByProject={notesByProject}
         handleProject={selectProject}
+        timer={timer}
+        gracePeriodDays={gracePeriodDays}
       />
       <NotesPanel
         project={project}
@@ -423,6 +438,8 @@ export default function App() {
         handleDeleteProject={handleSoftDeleteProject}
         handleDeleteNote={handleDeleteNote}
         handleRestoreProject={handleRestoreProject}
+        timer={timer}
+        gracePeriodDays={gracePeriodDays}
       />
     </div>
   );
