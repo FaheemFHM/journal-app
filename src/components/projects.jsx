@@ -1,16 +1,18 @@
 
 import { useState, useEffect, useMemo } from "react";
 import "./projects.css";
-import { timeAgo } from "../utils.js";
+import { timeAgo, getGracePeriod } from "../utils/dates.js";
 
 import Dropdown from "./dropdown";
 
 export default function ProjectsPanel({
   projects,
   notesByProject,
-  handleProject
+  selectProject,
+  timer,
+  gracePeriodDays,
 }) {
-  const filterOptions = ["All", "Pinned", "Starred", "Archived"];
+  const filterOptions = ["All", "Pinned", "Starred", "Archived", "Deleted"];
   const sortOptions = ["Modified", "Created", "Size"];
 
   const [search, setSearch] = useState("");
@@ -18,19 +20,21 @@ export default function ProjectsPanel({
   const [sort, setSort] = useState(sortOptions[0]);
   const [sortDir, setSortDir] = useState(false);
 
+  const applyingFilters = search.trim() !== "" || filter !== "All";
+  
   const filteredProjects = useMemo(() => {
-    return [...projects]
     // search
-    .filter(p => {
+    return [...projects].filter(p => {
       if (!search.trim()) return true;
-      return p.title.toLowerCase().includes(search.toLowerCase());
+      return p.text.toLowerCase().includes(search.toLowerCase());
     })
     // filter
     .filter(p => {
-      if (filter === "All") return true;
-      if (filter === "Pinned") return p.ispinned;
-      if (filter === "Starred") return p.isstarred;
-      if (filter === "Archived") return p.isarchived;
+      if (filter === "All") return !p.isdeleted;
+      if (filter === "Pinned") return p.ispinned && !p.isdeleted;
+      if (filter === "Starred") return p.isstarred && !p.isdeleted;
+      if (filter === "Archived") return p.isarchived && !p.isdeleted;
+      if (filter === "Deleted") return p.isdeleted;
       return true;
     })
     // sort
@@ -105,11 +109,19 @@ export default function ProjectsPanel({
               project={p}
               len={notesByProject[p.id] || 0}
               mod={timeAgo(p.datetimemodified)}
-              handleProject={handleProject}
+              selectProject={selectProject}
+              timer={timer}
+              gracePeriodDays={gracePeriodDays}
             />
           ))
         ) : (
-          <div className="no-projects">Please create your first project below...</div>
+          <div className="no-projects">
+            {
+              applyingFilters
+                ? "No projects match your current filters"
+                : "Please create your first project below"
+            }
+          </div>
         )}
       </div>
       <div className='projects-footer'>
@@ -124,20 +136,38 @@ function ProjectCard({
   project,
   len,
   mod,
-  handleProject
+  selectProject,
+  timer,
+  gracePeriodDays,
 }) {
+  const timeLeft = getGracePeriod(
+    project.datetimedeleted,
+    gracePeriodDays,
+    timer
+  );
+
   return (
-    <div className='project-card' onClick={() => handleProject(project)}>
+    <div className='project-card' onClick={() => selectProject(project)}>
       <div className={`project-card-header ${project.isarchived ? "cross-out" : ""}`}>
-        <span>{project.title}</span>
+        <span>{project.text}</span>
         {project.ispinned && <i className="bi bi-pin-angle-fill"></i>}
         {project.isstarred && <i className="bi bi-star-fill"></i>}
       </div>
-      <div className={`project-card-footer ${project.isarchived ? "cross-out" : ""}`}>
-        {len} notes 
-        <i className='bi bi-dot'></i> 
-        Modified {mod}
-      </div>
+      {
+        project.isdeleted ?
+        (
+          <div className="project-card-footer">
+            Grace Period = {timeLeft}
+          </div>
+        ) :
+        (
+          <div className={`project-card-footer ${project.isarchived ? "cross-out" : ""}`}>
+            {len} notes 
+            <i className='bi bi-dot'></i> 
+            Modified {mod}
+          </div>
+        )
+      }
     </div>
   );
 }

@@ -59,7 +59,7 @@ def main():
   for project_id in range(1, num_projects + 1):
     project = {
         "id": project_id,
-        "title": random_project(),
+        "text": random_project(),
         "datetimecreated": random_recent_datetime(59),
         "datetimemodified": random_recent_datetime(14),
         "ispinned": random_bool(0.2),

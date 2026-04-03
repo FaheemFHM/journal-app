@@ -1,29 +1,33 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import "./notes.css";
-import { timeAgo } from "../utils.js";
+import { timeAgo, getGracePeriod } from "../utils/dates.js";
 
 import Dropdown from "./dropdown";
 
 export default function NotesPanel({
   project,
   notes,
-  theme,
-  handleThemeIndex,
-  onToggleProject,
-  onToggleNote,
-  handleEditProject,
-  handleEditNote,
-  handleDeleteProject,
-  handleDeleteNote,
+
+  nextTheme,
+  toggleTheme,
+
+  onToggle,
+  onEdit,
+  onDelete,
+
+  timer,
+  gracePeriodDays,
 }) {
   const filterOptions = ["All", "Pinned", "Starred"];
-  const sortOptions = ["Position", "Modified", "Created", "ID"];
+  const sortOptions = ["Position", "Modified", "Created"];
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState(filterOptions[0]);
   const [sort, setSort] = useState(sortOptions[0]);
   const [sortDir, setSortDir] = useState(true); // true is ascending
+
+  const applyingFilters = search.trim() !== "" || filter !== "All";
 
   const filteredNotes = useMemo(() => {
     return [...notes]
@@ -52,9 +56,6 @@ export default function NotesPanel({
       } else if (sort === "Created") {
         valA = new Date(a.datetimecreated);
         valB = new Date(b.datetimecreated);
-      } else if (sort === "ID") {
-        valA = a.id;
-        valB = b.id;
       }
       
       return sortDir ? valA - valB : valB - valA;
@@ -98,46 +99,77 @@ export default function NotesPanel({
       <div className='content-header'>
         <div className='flexrow content-heading-container'>
           <ProjectTitleInput
-            value={project.title}
+            value={project.text}
             projectId={project.id}
-            handleEditProject={handleEditProject}
+            onEdit={onEdit}
+            active={!project.isdeleted}
           />
           <i className='bi bi-dot'></i>
-          <IconFillButton
-            icon='pin-angle'
-            iconAlt='pin-angle-fill'
-            classList='content-button'
-            active={project.ispinned}
-            onToggle={() => onToggleProject(project.id, "ispinned")}
-          />
-          <IconFillButton
-            icon='star'
-            iconAlt='star-fill'
-            classList='content-button'
-            active={project.isstarred}
-            onToggle={() => onToggleProject(project.id, "isstarred")}
-          />
-          <i className='bi bi-dot'></i>
-          <IconFillButton
-            icon='archive'
-            iconAlt='archive-fill'
-            classList='content-button'
-            active={project.isarchived}
-            onToggle={() => onToggleProject(project.id, "isarchived")}
-          />
-          <IconFillButton
-            icon='trash3'
-            iconAlt='trash3-fill'
-            classList='content-button'
-            active={false}
-            onToggle={() => handleDeleteProject(project.id)}
-          />
+          {
+            project.isdeleted ? (
+              <button
+                className="restore-project-button"
+                onClick={() => onDelete(project.id, true, false)}
+              >
+                Restore Project
+              </button>
+            ) : (
+              <>
+                <IconFillButton
+                  icon='pin-angle'
+                  iconAlt='pin-angle-fill'
+                  classList='content-button'
+                  active={project.ispinned}
+                  onToggle={() => onToggle(project.id, "ispinned", true)}
+                />
+                <IconFillButton
+                  icon='star'
+                  iconAlt='star-fill'
+                  classList='content-button'
+                  active={project.isstarred}
+                  onToggle={() => onToggle(project.id, "isstarred", true)}
+                />
+                <i className='bi bi-dot'></i>
+                <IconFillButton
+                  icon='archive'
+                  iconAlt='archive-fill'
+                  classList='content-button'
+                  active={project.isarchived}
+                  onToggle={() => onToggle(project.id, "isarchived", true)}
+                />
+                <IconFillButton
+                  icon='trash3'
+                  iconAlt='trash3-fill'
+                  classList='content-button'
+                  active={false}
+                  onToggle={() => onDelete(project.id, true, true)}
+                />
+              </>
+            )
+          }
           <i className='bi bi-dot'></i>
           <ThemeButton
-            theme={theme}
-            handleThemeIndex={handleThemeIndex}
+            nextTheme={nextTheme}
+            toggleTheme={toggleTheme}
           />
         </div>
+
+        {
+          project.isdeleted ?
+          (
+            <div className='flexrow'>
+              <div className="content-grace-period">
+              Time to deletion = {
+                getGracePeriod(
+                  project.datetimedeleted,
+                  gracePeriodDays,
+                  timer
+                )
+              }
+              </div>
+            </div>
+          ) : (<></>)
+        }
 
         <div className='flexrow content-subheader'>
           Created [ {formatDate(project.datetimecreated)} ] 
@@ -194,18 +226,27 @@ export default function NotesPanel({
               key={n.id}
               note={n}
               text={highlightSearchTerms(n.text)}
-              onToggleNote={onToggleNote}
-              onEditNote={handleEditNote}
-              onDeleteNote={handleDeleteNote}
+              onToggle={onToggle}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              active={!project.isdeleted}
             />
           ))
         ) : (
-          <div className="no-notes">Please create your first note below...</div>
+          <div className="no-notes">
+            {
+              applyingFilters
+                ? "No notes match your current filters"
+                : "Please create your first note below"
+            }
+          </div>
         )}
-        {}
       </div>
-
-      <div className='content-footer'>
+      
+      <div
+        className="content-footer"
+        style={{pointerEvents: !project.isdeleted ? "auto" : "none"}}
+      >
         <input type='text' placeholder='New note...'></input>
         <button><i className='bi bi-plus-circle'></i></button>
       </div>
@@ -216,13 +257,15 @@ export default function NotesPanel({
 function NoteCard({
   note,
   text,
-  onToggleNote,
-  onEditNote,
-  onDeleteNote,
+  onToggle,
+  onEdit,
+  onDelete,
+  active,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [localText, setLocalText] = useState(note.text);
   const textareaRef = useRef(null);
+  const canEdit = isEditing && active;
 
   // update local state
   useEffect(() => {
@@ -240,11 +283,19 @@ function NoteCard({
     }
   }, [isEditing]);
 
+  // force exit edit mode
+  useEffect(() => {
+    if (!canEdit && isEditing) {
+      setIsEditing(false);
+    }
+  }, [canEdit, isEditing]);
+
+  // grow textarea to fit text without any scrolling
   function autoResize() {
     const el = textareaRef.current;
     if (!el) return;
-    el.style.height = "auto"; // reset
-    el.style.height = (el.scrollHeight + 5.5) + "px"; // grow to fit content
+    el.style.height = "auto";
+    el.style.height = (el.scrollHeight) + "px";
   }
   
   function handleSave() {
@@ -256,18 +307,18 @@ function NoteCard({
       return;
     }
 
-    onEditNote(note.id, trimmed);
+    onEdit(note.id, trimmed, false);
     setIsEditing(false);
   }
 
   return(
-    <div className='note-card'>
+    <div className={`note-card ${active ? "" : "disabled"}`}>
       <button className='note-card-drag'>
         <i className='bi bi-grip-vertical'></i>
       </button>
 
       {
-        isEditing ? (
+        canEdit  ? (
           <textarea
             ref={textareaRef}
             className="note-card-textarea"
@@ -288,7 +339,9 @@ function NoteCard({
           <div
             className="note-card-text"
             onClick={() => setIsEditing(true)}
-          >{text}</div>
+          >
+            {text}
+          </div>
         )
       }
 
@@ -298,14 +351,14 @@ function NoteCard({
           iconAlt='pin-angle-fill'
           classList='note-card-reaction'
           active={note.ispinned}
-          onToggle={() => onToggleNote(note.id, "ispinned")}
+          onToggle={() => onToggle(note.id, "ispinned", false)}
         />
         <IconFillButton
           icon='star'
           iconAlt='star-fill'
           classList='note-card-reaction'
           active={note.isstarred}
-          onToggle={() => onToggleNote(note.id, "isstarred")}
+          onToggle={() => onToggle(note.id, "isstarred", false)}
         />
       </div>
 
@@ -318,21 +371,21 @@ function NoteCard({
           iconAlt='trash3-fill'
           classList='note-card-reaction'
           active={false}
-          onToggle={() => onDeleteNote(note.id)}
+          onToggle={() => onDelete(note.id, false, false)}
         />
       </div>
     </div>
   );
 }
 
-function ThemeButton({theme, handleThemeIndex}) {
+function ThemeButton({nextTheme, toggleTheme}) {
   const [hovered, setHovered] = useState(false);
-  let iconClass = `bi bi-${hovered ? theme.iconAlt : theme.icon}`;
+  const iconClass = `bi bi-${hovered ? nextTheme.iconAlt : nextTheme.icon}`;
 
   return (
     <button
       className='content-button'
-      onClick={() => handleThemeIndex()}
+      onClick={() => toggleTheme()}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -341,7 +394,13 @@ function ThemeButton({theme, handleThemeIndex}) {
   );
 }
 
-function IconFillButton({ icon, iconAlt, classList, active, onToggle }) {
+function IconFillButton({
+  icon,
+  iconAlt, 
+  classList,
+  active,
+  onToggle
+}) {
   return (
     <button
       className={`${classList} ${active ? 'active' : ''}`}
@@ -355,7 +414,8 @@ function IconFillButton({ icon, iconAlt, classList, active, onToggle }) {
 function ProjectTitleInput({
   value = "Empty Title",
   projectId,
-  handleEditProject
+  onEdit,
+  active
 }) {
   const [localValue, setLocalValue] = useState(value);
 
@@ -380,7 +440,7 @@ function ProjectTitleInput({
 
     if (trimmed === value) return;
 
-    handleEditProject(projectId, trimmed);
+    onEdit(projectId, trimmed, true);
   }
 
   return (
@@ -396,6 +456,7 @@ function ProjectTitleInput({
           e.target.blur();
         }
       }}
+      style={{pointerEvents: active ? "auto" : "none"}}
     />
   );
 }

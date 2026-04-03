@@ -110,6 +110,7 @@
 
 .project-card-header {
   width: 100%;
+  line-height: 1.25rem;
   margin-bottom: 0.5rem;
   display: flex;
 }
@@ -126,8 +127,8 @@
   min-width: 1rem;
   width: 1rem;
   aspect-ratio: 1 / 1;
-
   margin: 0 0.25rem;
+  margin-left: auto;
 }
 
 .project-card-footer {
