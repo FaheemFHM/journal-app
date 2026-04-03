@@ -18,10 +18,11 @@ export default function ProjectsPanel({
   const [sort, setSort] = useState(sortOptions[0]);
   const [sortDir, setSortDir] = useState(false);
 
+  const applyingFilters = search.trim() !== "" || filter !== "All";
+  
   const filteredProjects = useMemo(() => {
-    return [...projects]
     // search
-    .filter(p => {
+    return [...projects].filter(p => {
       if (!search.trim()) return true;
       return p.title.toLowerCase().includes(search.toLowerCase());
     })
@@ -110,7 +111,13 @@ export default function ProjectsPanel({
             />
           ))
         ) : (
-          <div className="no-projects">Please create your first project below...</div>
+          <div className="no-projects">
+            {
+              applyingFilters
+                ? "No projects match your current filters"
+                : "Please create your first project below"
+            }
+          </div>
         )}
       </div>
       <div className='projects-footer'>

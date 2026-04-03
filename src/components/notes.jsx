@@ -25,6 +25,8 @@ export default function NotesPanel({
   const [sort, setSort] = useState(sortOptions[0]);
   const [sortDir, setSortDir] = useState(true); // true is ascending
 
+  const applyingFilters = search.trim() !== "" || filter !== "All";
+  
   const filteredNotes = useMemo(() => {
     return [...notes]
     // search
@@ -200,9 +202,14 @@ export default function NotesPanel({
             />
           ))
         ) : (
-          <div className="no-notes">Please create your first note below...</div>
+          <div className="no-notes">
+            {
+              applyingFilters
+                ? "No notes match your current filters"
+                : "Please create your first note below"
+            }
+          </div>
         )}
-        {}
       </div>
 
       <div className='content-footer'>
@@ -244,7 +251,7 @@ function NoteCard({
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = "auto"; // reset
-    el.style.height = (el.scrollHeight + 5.5) + "px"; // grow to fit content
+    el.style.height = (el.scrollHeight) + "px"; // grow to fit content
   }
   
   function handleSave() {
