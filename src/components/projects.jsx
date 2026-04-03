@@ -29,9 +29,9 @@ export default function ProjectsPanel({
     // filter
     .filter(p => {
       if (filter === "All") return !p.isdeleted;
-      if (filter === "Pinned") return p.ispinned;
-      if (filter === "Starred") return p.isstarred;
-      if (filter === "Archived") return p.isarchived;
+      if (filter === "Pinned") return p.ispinned && !p.isdeleted;
+      if (filter === "Starred") return p.isstarred && !p.isdeleted;
+      if (filter === "Archived") return p.isarchived && !p.isdeleted;
       if (filter === "Deleted") return p.isdeleted;
       return true;
     })
