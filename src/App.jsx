@@ -5,6 +5,8 @@ import './App.css';
 import ProjectsPanel from "./components/projects";
 import NotesPanel from "./components/notes";
 
+import {isExpired} from "./utils";
+
 export default function App() {
 
   // === theme controls ===
@@ -59,25 +61,26 @@ export default function App() {
   const [project, setProject] = useState({});
 
   // make all IDs numeric and select project
-  function handleProject(newProject) {
+  function selectProject(newProject) {
     setProject({
       ...newProject,
       id: Number(newProject.id)
     });
   }
 
-  // set default project
+  // set default selected project
   useEffect(() => {
     if (projects.length < 1) return;
 
-    const earliestProject = projects.reduce((earliest, prj) => {
+    // ignore deleted projects
+    const activeProjects = projects.filter(p => !p.isdeleted);
+
+    const earliestProject = activeProjects.reduce((earliest, prj) => {
       const mod = new Date(prj.datetimemodified);
       const old = new Date(earliest.datetimemodified);
-      return mod > old
-        ? prj
-        : earliest;
-    }, projects[0]); // start with first elem as earliest
-
+      return mod > old ? prj : earliest;
+    }, activeProjects[0]); // start with first elem as earliest
+    
     setProject(earliestProject);
   }, [projects]);
 
@@ -330,18 +333,136 @@ export default function App() {
     });
   }
   
-  function handleDeleteProject(pId) {
+  function handleSoftDeleteProject(pId) {
     if (!window.confirm(
       `Are you sure you would like to delete project ${pId}?`
     )) return;
+
+    const newDate = new Date().toISOString();
+
+    setProjects(prevProjects => {
+      // find project to delete
+      const pToDelete = prevProjects.find(p => p.id === pId);
+      if (!pToDelete) return prevProjects;
+
+      // store previous state
+      const prevProjectsState = [...prevProjects];
+
+      // update local state
+        const newProjects = prevProjects.map(p =>
+        p.id === pId
+          ? {
+              ...p,
+              isdeleted: true,
+              datetimedeleted: newDate
+            }
+          : p
+      );
+
+      // send backend request (soft delete)
+      fetch(`http://localhost:5000/projects/${pId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          isdeleted: true,
+          datetimedeleted: newDate
+        })
+      }).catch(err => {
+        console.error(err);
+        setProjects(prevProjectsState);
+      });
+
+      return newProjects;
+    });
   }
+
+  const gracePeriodDays = 3;
+
+  function deleteAllExpiredProjects() {
+    if (projects.length < 1) return;
+    setProjects(prevProjects => {
+      // store previous state
+      const prevProjectsState = [...prevProjects];
+
+      // find projects that have expired
+      const expiredProjects = prevProjects.filter(p => 
+        p.isdeleted && isExpired(p.datetimedeleted, gracePeriodDays)
+      );
+      
+      // update local state immediately
+      const newProjects = prevProjects.filter(
+        p => !isExpired(p.datetimedeleted, gracePeriodDays)
+      );
+
+      // send backend delete requests for each expired project
+      expiredProjects.forEach(p => {
+        fetch(`http://localhost:5000/projects/${p.id}`, {
+          method: "DELETE"
+        }).catch(err => {
+          console.error(err);
+          setProjects(prevProjectsState);
+        });
+      });
+
+      return newProjects;
+    });
+  }
+
+  // useEffect(() => {
+  //   if (projects.length > 0) {
+  //     deleteAllExpiredProjects();
+  //   }
+  // }, [projects]);
+
+  function handleRestoreProject(pId) {
+    setProjects(prevProjects => {
+      const prevProjectsState = [...prevProjects];
+
+      const newProjects = prevProjects.map(p =>
+        p.id === pId
+          ? {
+              ...p,
+              isdeleted: false,
+              datetimedeleted: null
+            }
+          : p
+      );
+
+      fetch(`http://localhost:5000/projects/${pId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          isdeleted: false,
+          datetimedeleted: null
+        })
+      }).catch(err => {
+        console.error(err);
+        setProjects(prevProjectsState);
+      });
+
+      return newProjects;
+    });
+  }
+
+  // global timer
+  const [timer, setTimer] = useState(Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimer(Date.now());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className='app'>
       <ProjectsPanel
         projects={projects}
         notesByProject={notesByProject}
-        handleProject={handleProject}
+        handleProject={selectProject}
+        timer={timer}
+        gracePeriodDays={gracePeriodDays}
       />
       <NotesPanel
         project={project}
@@ -352,8 +473,11 @@ export default function App() {
         onToggleNote={handleToggleNote}
         handleEditProject={handleEditProject}
         handleEditNote={handleEditNote}
-        handleDeleteProject={handleDeleteProject}
+        handleDeleteProject={handleSoftDeleteProject}
         handleDeleteNote={handleDeleteNote}
+        handleRestoreProject={handleRestoreProject}
+        timer={timer}
+        gracePeriodDays={gracePeriodDays}
       />
     </div>
   );
