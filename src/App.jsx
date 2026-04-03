@@ -72,7 +72,7 @@ export default function App() {
 
     // ignore deleted projects
     const activeProjects = projects.filter(p => !p.isdeleted);
-    
+
     const earliestProject = activeProjects.reduce((earliest, prj) => {
       const mod = new Date(prj.datetimemodified);
       const old = new Date(earliest.datetimemodified);
@@ -347,8 +347,16 @@ export default function App() {
       const prevProjectsState = [...prevProjects];
 
       // update local state
-      const newProjects = prevProjects.filter(p => p.id !== pId);
-
+        const newProjects = prevProjects.map(p =>
+        p.id === pId
+          ? {
+              ...p,
+              isdeleted: true,
+              datetimedeleted: newDate
+            }
+          : p
+      );
+      
       // send backend request (soft delete)
       fetch(`http://localhost:5000/projects/${pId}`, {
         method: "PATCH",

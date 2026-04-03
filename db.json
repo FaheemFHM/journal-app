@@ -16,11 +16,11 @@
       "title": "Tempor Sit Ipsum",
       "datetimecreated": "2026-03-25T16:01:49.292Z",
       "datetimemodified": "2026-04-03T11:00:49.292Z",
-      "datetimedeleted": "2026-04-03T17:56:58.145Z",
+      "datetimedeleted": null,
       "ispinned": true,
       "isstarred": false,
       "isarchived": false,
-      "isdeleted": true
+      "isdeleted": false
     },
     {
       "id": "3",
