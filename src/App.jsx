@@ -124,7 +124,7 @@ export default function App() {
       deleteNote(xId, notes, setNotes, setProjects);
     }
   }
-
+  
   return (
     <div className='app'>
       <ProjectsPanel
