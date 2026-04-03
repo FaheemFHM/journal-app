@@ -23,3 +23,37 @@ export function timeAgo(dateString) {
   const years = Math.floor(days / 365);
   return `${years}y ago`;
 }
+
+export function getExpiryDate(deletedDate, graceDays) {
+  const d = new Date(deletedDate);
+  d.setDate(d.getDate() + graceDays);
+  return d;
+}
+
+export function getGracePeriod(deletedDate, graceDays) {
+  const now = new Date();
+  const expiry = getExpiryDate(deletedDate, graceDays);
+
+  let diff = Math.max(0, expiry - now); // ms remaining
+  const seconds = Math.floor(diff / 1000);
+
+  const days = Math.floor(seconds / (60 * 60 * 24));
+  const hours = Math.floor((seconds % (60 * 60 * 24)) / (60 * 60));
+  const minutes = Math.floor((seconds % (60 * 60)) / 60);
+  const secs = seconds % 60;
+
+  const parts = [
+    days && `${days}d`,
+    hours && `${hours}h`,
+    minutes && `${minutes}m`,
+    secs && `${secs}s`
+  ].filter(Boolean);
+
+  return parts.length ? parts.join(" ") : "0s";
+}
+
+export function isExpired(deletedDate, graceDays) {
+  const now = new Date();
+  const expiry = getExpiryDate(deletedDate, graceDays);
+  return now >= expiry;
+}

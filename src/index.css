@@ -101,6 +101,10 @@ textarea::placeholder {
   color: magenta;
 }
 
+.bi-trash3-fill {
+  color: rgb(255, 50, 50);
+}
+
 .bi-dot {
   margin: 0 0.25rem;
 }

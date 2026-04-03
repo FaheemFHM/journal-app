@@ -31,7 +31,7 @@
   height: 100%;
 
   font-weight: 600;
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   line-height: 2rem;
   padding: 0 0.5rem 0.1rem 0.5rem;
 
@@ -49,10 +49,38 @@
   font-size: 0.85rem;
 }
 
+.restore-project-button {
+  height: 100%;
+  width: 100%;
+
+  font-size: 1.25rem;
+  font-weight: 500;
+
+  background-color: var(--primary);
+  border: 1px solid var(--text);
+}
+
+.restore-project-button:hover {
+  background-color: var(--primary-hover);
+}
+
 .content-subheader {
   font-size: 0.8rem;
   color: var(--text-muted);
   padding-top: 0.2rem;
+}
+
+.content-grace-period {
+  width: 100%;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+
+  font-size: 1.25rem;
+  font-weight: 500;
+
+  background-color: var(--primary);
+  border: 1px solid var(--text);
+  border-radius: 0.5rem;
 }
 
 .content-fss-labels {
@@ -124,6 +152,10 @@
   display: flex;
 }
 
+.note-card.disabled {
+  pointer-events: none;
+}
+
 .note-card-drag {
   height: 100%;
   min-height: 2rem;
@@ -153,11 +185,12 @@
   border: 3px solid var(--bg);
   border-radius: 0;
   
-  cursor: pointer;
+  cursor: default;
   white-space: pre-wrap;
 }
 
 .note-card-textarea {
+  min-height: 100%;
   flex: 1;
   padding: 0.5rem 0.75rem;
   
@@ -178,7 +211,8 @@
 
 .note-card-text:hover {
   background-color: var(--surface);
-  border: 3px solid var(--surface)
+  border: 3px solid var(--surface);
+  cursor: pointer;
 }
 
 .note-card-textarea:hover {
@@ -239,6 +273,7 @@
 
 .content-footer {
   width: 100%;
+
   display: flex;
   margin-top: 1rem;
   padding: 1rem 0;

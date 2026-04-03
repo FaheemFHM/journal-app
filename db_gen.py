@@ -62,9 +62,11 @@ def main():
         "text": random_project(),
         "datetimecreated": random_recent_datetime(59),
         "datetimemodified": random_recent_datetime(14),
+        "datetimedeleted": None,
         "ispinned": random_bool(0.2),
         "isstarred": random_bool(0.3),
-        "isarchived": random_bool(0.1)
+        "isarchived": random_bool(0.1),
+        "isdeleted": False
     }
     projects.append(project)
 
