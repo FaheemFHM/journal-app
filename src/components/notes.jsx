@@ -94,6 +94,12 @@ export default function NotesPanel({
     );
   }
 
+  const gracePeriod = project != null ? getGracePeriod(
+    project.datetimedeleted,
+    gracePeriodDays,
+    timer
+  ) : "";
+
   return project != null ?
   (
     <div className='notes-panel'>
@@ -160,13 +166,7 @@ export default function NotesPanel({
           (
             <div className='flexrow'>
               <div className="content-grace-period">
-              Time to deletion = {
-                getGracePeriod(
-                  project.datetimedeleted,
-                  gracePeriodDays,
-                  timer
-                )
-              }
+              Time to deletion = {gracePeriod}
               </div>
             </div>
           ) : (<></>)

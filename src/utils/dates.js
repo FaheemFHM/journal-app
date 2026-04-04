@@ -31,6 +31,7 @@ export function getExpiryDate(deletedDate, graceDays) {
 }
 
 export function getGracePeriod(deletedDate, graceDays) {
+  if (deletedDate == null) return "";
   const now = new Date();
   const expiry = getExpiryDate(deletedDate, graceDays);
 

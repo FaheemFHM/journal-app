@@ -92,25 +92,20 @@ export default function App() {
 
   function handleDelete(xId, isProject, doDelete) {
     if (isProject) {
-      deleteProject(xId, doDelete, projects, setProjects);
+      deleteProject(xId, doDelete, projects, setProjects, setProject);
       
-      const updatedProjects = projects.map(p =>
-        p.id === xId ? { ...p, isdeleted: doDelete } : p
-      );
+      // const updatedProjects = projects.map(p =>
+      //   p.id === xId ? { ...p, isdeleted: doDelete } : p
+      // );
 
-      setProjects(updatedProjects);
-      setProject(refreshSelectedProject(updatedProjects, xId));
+      // setProjects(updatedProjects);
+      // setProject(refreshSelectedProject(updatedProjects, xId));
     } else {
       deleteNote(xId, notes, setNotes, setProjects);
     }
   }
 
   // === other functions and values ===
-
-  function refreshSelectedProject(pList, pId = null) {
-    const active = pList.filter(p => !p.isdeleted);
-    return active.find(p => p.id === pId) || getFirstProject(active);
-  }
 
   function getFirstProject(activeProjects) {
     let defaultProject = null;

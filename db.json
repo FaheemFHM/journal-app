@@ -38,22 +38,22 @@
       "text": "Magna Adipiscing",
       "datetimecreated": "2026-02-25T00:34:29.383Z",
       "datetimemodified": "2026-03-29T18:56:29.383Z",
-      "datetimedeleted": "2026-04-04T00:49:45.520Z",
+      "datetimedeleted": null,
       "ispinned": true,
       "isstarred": true,
       "isarchived": false,
-      "isdeleted": true
+      "isdeleted": false
     },
     {
       "id": "5",
       "text": "Incididunt",
       "datetimecreated": "2026-02-26T00:34:29.383Z",
       "datetimemodified": "2026-04-02T19:19:29.383Z",
-      "datetimedeleted": "2026-04-04T00:49:09.833Z",
+      "datetimedeleted": null,
       "ispinned": false,
       "isstarred": false,
       "isarchived": false,
-      "isdeleted": true
+      "isdeleted": false
     },
     {
       "id": "6",
@@ -104,11 +104,11 @@
       "text": "Ut Labore",
       "datetimecreated": "2026-03-16T16:34:29.393Z",
       "datetimemodified": "2026-04-04T00:01:29.393Z",
-      "datetimedeleted": "2026-04-04T00:49:41.225Z",
+      "datetimedeleted": null,
       "ispinned": false,
       "isstarred": true,
       "isarchived": false,
-      "isdeleted": true
+      "isdeleted": false
     },
     {
       "id": "11",
@@ -181,11 +181,11 @@
       "text": "Labore",
       "datetimecreated": "2026-03-18T14:34:29.400Z",
       "datetimemodified": "2026-04-03T20:34:29.400Z",
-      "datetimedeleted": "2026-04-04T00:49:52.585Z",
+      "datetimedeleted": null,
       "ispinned": false,
       "isstarred": false,
       "isarchived": false,
-      "isdeleted": true
+      "isdeleted": false
     },
     {
       "id": "18",
