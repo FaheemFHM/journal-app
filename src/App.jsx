@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, act } from 'react';
 import './App.css';
 
 import ProjectsPanel from "./components/projects";
@@ -45,16 +45,7 @@ export default function App() {
         const activeProjects = projectsList.filter(p => !p.isdeleted);
 
         // pick the most recently modified project on startup
-        let defaultProject = null;
-
-        if (activeProjects.length > 0) {
-          defaultProject = activeProjects.reduce((latest, prj) => {
-            const mod = new Date(prj.datetimemodified);
-            const lastMod = new Date(latest.datetimemodified);
-            return mod > lastMod ? prj : latest;
-          }, activeProjects[0]);
-        }
-
+        const defaultProject = getFirstProject(activeProjects);
         setProject(defaultProject);
 
         // fetch (promise) -> noteRes (response) -> noteData (json)
@@ -100,14 +91,40 @@ export default function App() {
   }
 
   function handleDelete(xId, isProject, doDelete) {
-    if (isProject){
+    if (isProject) {
       deleteProject(xId, doDelete, projects, setProjects);
-    } else{
+      
+      const updatedProjects = projects.map(p =>
+        p.id === xId ? { ...p, isdeleted: doDelete } : p
+      );
+
+      setProjects(updatedProjects);
+      setProject(refreshSelectedProject(updatedProjects, xId));
+    } else {
       deleteNote(xId, notes, setNotes, setProjects);
     }
   }
 
   // === other functions and values ===
+
+  function refreshSelectedProject(pList, pId = null) {
+    const active = pList.filter(p => !p.isdeleted);
+    return active.find(p => p.id === pId) || getFirstProject(active);
+  }
+
+  function getFirstProject(activeProjects) {
+    let defaultProject = null;
+
+    if (activeProjects.length > 0) {
+      defaultProject = activeProjects.reduce((latest, prj) => {
+        const mod = new Date(prj.datetimemodified);
+        const lastMod = new Date(latest.datetimemodified);
+        return mod > lastMod ? prj : latest;
+      }, activeProjects[0]);
+    }
+
+    return defaultProject;
+  }
 
   function selectProject(newProject) {
     setProject(newProject);
