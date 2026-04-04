@@ -19,85 +19,67 @@ export default function App() {
   const timer = useTimer();
   const gracePeriodDays = 3;
 
-  // === theme controls ===
-
   const {nextTheme, toggleTheme} = useTheme();
 
-  // === load full projects list ===
-
   const [projects, setProjects] = useState([]);
-
-  useEffect(() => {
-    fetch("http://localhost:5000/projects")
-    .then(res => res.json())
-    .then(data => setProjects(
-      data.map(n => ({
-        ...n,
-        id: Number(n.id)
-      }))
-    ))
-    .catch(err => console.error(err))
-  }, []);
-
-  const [project, setProject] = useState({});
-
-  // make all IDs numeric and select project
-  function selectProject(newProject) {
-    setProject({
-      ...newProject,
-      id: Number(newProject.id)
-    });
-  }
-
-  // set default selected project
-  useEffect(() => {
-    if (projects.length < 1) return;
-
-    // ignore deleted projects
-    const activeProjects = projects.filter(p => !p.isdeleted);
-
-    const earliestProject = activeProjects.reduce((earliest, prj) => {
-      const mod = new Date(prj.datetimemodified);
-      const old = new Date(earliest.datetimemodified);
-      return mod > old ? prj : earliest;
-    }, activeProjects[0]); // start with first elem as earliest
-    
-    setProject(earliestProject);
-  }, [projects]);
-
-  // === load full notes list ===
-
+  const [project, setProject] = useState(null);
   const [notes, setNotes] = useState([]);
 
+  // === main initialisation ===
+
   useEffect(() => {
-    fetch("http://localhost:5000/notes")
-      .then(res => res.json())
-      .then(data => setNotes(
-        // make all IDs numeric
-        data.map(n => ({
-          ...n,
-          project_id: Number(n.project_id)
-        }))
-      ))
-      .catch(console.error);
+    const loadDataSequentially = async () => {
+      try {
+        // fetch (promise) -> projRes (response) -> projData (json)
+        const projRes = await fetch("http://localhost:5000/projects");
+        let projData = await projRes.json();
+        if (!Array.isArray(projData)) projData = [];
+
+        // ensure numeric ids
+        const projectsList = projData.map(p => ({ ...p, id: Number(p.id) }));
+        
+        // update projects list ui
+        setProjects(projectsList);
+        
+        // get active projects
+        const activeProjects = projectsList.filter(p => !p.isdeleted);
+
+        // pick the most recently modified project on startup
+        let defaultProject = null;
+
+        if (activeProjects.length > 0) {
+          defaultProject = activeProjects.reduce((latest, prj) => {
+            const mod = new Date(prj.datetimemodified);
+            const lastMod = new Date(latest.datetimemodified);
+            return mod > lastMod ? prj : latest;
+          }, activeProjects[0]);
+        }
+
+        setProject(defaultProject);
+
+        // fetch (promise) -> noteRes (response) -> noteData (json)
+        const noteRes = await fetch("http://localhost:5000/notes");
+        let noteData = await noteRes.json();
+        if (!Array.isArray(noteData)) noteData = [];
+
+        // ensure numeric ids
+        const notesList = noteData.map(n => ({ ...n, project_id: Number(n.project_id) }));
+        
+        // update notes list ui
+        setNotes(notesList);
+
+      } catch (err) {
+        console.error("Error loading data:", err);
+        setProjects([]);
+        setProject(null);
+        setNotes([]);
+      }
+    };
+
+    loadDataSequentially();
   }, []);
 
-  const filteredNotes = project?.id
-    ? notes.filter(n => n.project_id === project.id)
-    : [];
-
-  // reduce takes an array and reduces it into a single value
-  // array.reduce((accumulator, currentValue) => { ... }, initialValue)
-  // acc: accumulator = iteration counter
-  // n: current element of array being processed
-  // reduce returns the final accumulator object
-  // acc has signature: {key=project_id, value=note_count}
-  const notesByProject = notes.reduce((acc, n) => {
-    acc[n.project_id] = (acc[n.project_id] || 0) + 1;
-    return acc;
-  }, {});
-
-  // === CRUD project/note handlers ===
+  // === CRUD handlers ===
 
   function handleToggle(xId, field, isProject) {
     toggleIcon(
@@ -124,7 +106,24 @@ export default function App() {
       deleteNote(xId, notes, setNotes, setProjects);
     }
   }
+
+  // === other functions and values ===
+
+  function selectProject(newProject) {
+    setProject(newProject);
+  }
+
+  const filteredNotes = project?.id
+    ? notes.filter(n => n.project_id === project.id)
+    : [];
+
+  const notesByProject = notes.reduce((acc, n) => {
+    acc[n.project_id] = (acc[n.project_id] || 0) + 1;
+    return acc;
+  }, {});
   
+  // === return app jsx ===
+
   return (
     <div className='app'>
       <ProjectsPanel

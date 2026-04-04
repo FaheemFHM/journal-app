@@ -93,8 +93,9 @@ export default function NotesPanel({
       )
     );
   }
-  
-  return (
+
+  return project != null ?
+  (
     <div className='notes-panel'>
       <div className='content-header'>
         <div className='flexrow content-heading-container'>
@@ -251,6 +252,8 @@ export default function NotesPanel({
         <button><i className='bi bi-plus-circle'></i></button>
       </div>
     </div>
+  ) : (
+    <div className="no-projects"></div>
   );
 }
 
