@@ -45,6 +45,11 @@ export default function NotesPanel({
     })
     // sort
     .sort((a, b) => {
+      // pinned to top
+      if (a.ispinned && !b.ispinned) return -1;
+      if (!a.ispinned && b.ispinned) return 1;
+
+      // normal sort
       let valA, valB;
 
       if (sort === "Position") {

@@ -55,7 +55,7 @@ export function deleteProject(
     // on restore: select the restored project
     newSelected = newState.find(p => p.id === pId);
   }
-  
+
   setProject(newSelected);
 
   // backend update
@@ -66,6 +66,7 @@ export function deleteProject(
   }).catch(err => {
     console.error(err);
     setProjects(prevState);
+    setProject(prevState.find(p => p.id === pId));
   });
 }
 
