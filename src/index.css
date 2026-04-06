@@ -22,8 +22,8 @@
   --text: #e2e2e2; /* main text */
   --text-muted: #c2c2c2; /* lesser text like subtitles */
   
-  --primary: #a7eee4; /* main brand colour */
-  --primary-hover: #84d8cd; /* hover brand colour */
+  --primary: #1f9e8d; /* main brand colour */
+  --primary-hover: #188a7a; /* hover brand colour */
 }
 
 [data-theme="light"] {
@@ -35,8 +35,8 @@
   --text: #333333;
   --text-muted: #64748b;
 
-  --primary: #a7eee4;
-  --primary-hover: #84d8cd;
+  --primary: #80f9e9;
+  --primary-hover: #6aebda;
 }
 
 body {

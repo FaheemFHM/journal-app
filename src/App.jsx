@@ -5,9 +5,14 @@ import './App.css';
 import ProjectsPanel from "./components/projects";
 import NotesPanel from "./components/notes";
 
+import { isExpired } from "./utils/dates";
 import { toggleIcon } from "./utils/handleToggle";
 import { editProject, editNote } from "./utils/handleEdit";
-import { deleteProject, deleteNote } from "./utils/handleDelete";
+import {
+  deleteProject,
+  deleteNote,
+  deleteAllExpired
+} from "./utils/handleDelete";
 
 import useTimer from "./utils/useTimer";
 import useTheme from "./utils/useTheme";
@@ -30,34 +35,47 @@ export default function App() {
   useEffect(() => {
     const loadDataSequentially = async () => {
       try {
-        // fetch (promise) -> projRes (response) -> projData (json)
-        const projRes = await fetch("http://localhost:5000/projects");
-        let projData = await projRes.json();
-        if (!Array.isArray(projData)) projData = [];
-
-        // ensure numeric ids
-        const projectsList = projData.map(p => ({ ...p, id: Number(p.id) }));
+        // get full lists from backend
+        const [projectsList, notesList] = await Promise.all([
+          fetchAllProjects(),
+          fetchAllNotes()
+        ]);
         
-        // update projects list ui
-        setProjects(projectsList);
+        // get expired things
+        const expiredProjectIds = new Set(
+          projectsList
+          .filter(p => p.isdeleted && isExpired(p.datetimedeleted, gracePeriodDays))
+          .map(p => p.id)
+        );
+
+        const expiredNoteIds = new Set(
+          notesList
+          .filter(n => expiredProjectIds.has(n.project_id))
+          .map(n => n.id)
+        );
+
+        // get remaining things
+        const remainingProjects = projectsList.filter(
+          p => !expiredProjectIds.has(p.id)
+        );
         
-        // get active projects
-        const activeProjects = projectsList.filter(p => !p.isdeleted);
+        const remainingNotes = notesList.filter(
+          n => !expiredNoteIds.has(n.id)
+        );
 
-        // pick the most recently modified project on startup
-        const defaultProject = getFirstProject(activeProjects);
-        setProject(defaultProject);
+        // hard-delete expired things
+        if (expiredNoteIds.size > 0) {
+          await deleteAllExpired(expiredNoteIds, "notes");
+        }
 
-        // fetch (promise) -> noteRes (response) -> noteData (json)
-        const noteRes = await fetch("http://localhost:5000/notes");
-        let noteData = await noteRes.json();
-        if (!Array.isArray(noteData)) noteData = [];
-
-        // ensure numeric ids
-        const notesList = noteData.map(n => ({ ...n, project_id: Number(n.project_id) }));
+        if (expiredProjectIds.size > 0) {
+          await deleteAllExpired(expiredProjectIds, "projects");
+        }
         
-        // update notes list ui
-        setNotes(notesList);
+        // update ui
+        setProjects(remainingProjects);
+        setNotes(remainingNotes);
+        setFirstProject(remainingProjects);
 
       } catch (err) {
         console.error("Error loading data:", err);
@@ -69,6 +87,35 @@ export default function App() {
 
     loadDataSequentially();
   }, []);
+
+  // === fetch handlers ===
+
+  async function fetchAllProjects() {
+    // fetch (promise) -> projRes (response) -> projData (json)
+    const projRes = await fetch("http://localhost:5000/projects");
+    let projData = await projRes.json();
+    if (!Array.isArray(projData)) projData = [];
+    return projData.map(
+      p => ({
+        ...p,
+        id: Number(p.id)
+      })
+    );
+  }
+
+  async function fetchAllNotes() {
+    // fetch (promise) -> noteRes (response) -> noteData (json)
+    const noteRes = await fetch("http://localhost:5000/notes");
+    let noteData = await noteRes.json();
+    if (!Array.isArray(noteData)) noteData = [];
+    return noteData.map(
+      n => ({
+        ...n,
+        id: Number(n.id),
+        project_id: Number(n.project_id)
+      })
+    );
+  }
 
   // === CRUD handlers ===
 
@@ -106,6 +153,12 @@ export default function App() {
   }
 
   // === other functions and values ===
+
+  function setFirstProject(remainingProjects) {
+    const activeProjects = remainingProjects.filter(p => !p.isdeleted);
+    const defaultProject = getFirstProject(activeProjects);
+    setProject(defaultProject);
+  }
 
   function getFirstProject(activeProjects) {
     let defaultProject = null;

@@ -97,32 +97,23 @@ export function deleteNote(nId, notes, setNotes, setProjects) {
   }).catch(console.error);
 }
 
-export function deleteAllExpiredProjects() {
-  if (projects.length < 1) return;
-  setProjects(prevProjects => {
-    // store previous state
-    const prevProjectsState = [...prevProjects];
-
-    // find projects that have expired
-    const expiredProjects = prevProjects.filter(p => 
-      p.isdeleted && isExpired(p.datetimedeleted, gracePeriodDays)
-    );
-    
-    // update local state immediately
-    const newProjects = prevProjects.filter(
-      p => !isExpired(p.datetimedeleted, gracePeriodDays)
-    );
-
-    // send backend delete requests for each expired project
-    expiredProjects.forEach(p => {
-      fetch(`http://localhost:5000/projects/${p.id}`, {
+export async function deleteAllExpired(expiredIds, endpoint) {
+  await Promise.all(
+    Array
+    .from(expiredIds)
+    .map(async (xId) => {
+      const res = await fetch(`http://localhost:5000/${endpoint}/${xId}`, {
         method: "DELETE"
-      }).catch(err => {
-        console.error(err);
-        setProjects(prevProjectsState);
       });
-    });
 
-    return newProjects;
-  });
+      if (!res.ok) {
+        if (res.status === 404) {
+          console.warn(`Could not find: ${endpoint}/${xId}`);
+        }
+        else {
+          console.warn(`Failed to delete: ${endpoint}/${xId}`);
+        }
+      }
+    })
+  );
 }
