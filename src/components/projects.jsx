@@ -6,6 +6,7 @@ import { timeAgo, getGracePeriod } from "../utils/dates.js";
 import Dropdown from "./dropdown";
 
 export default function ProjectsPanel({
+  project,
   projects,
   notesByProject,
   selectProject,
@@ -111,6 +112,7 @@ export default function ProjectsPanel({
           filteredProjects.map(p => (
             <ProjectCard
               key={p.id}
+              selectedId={project.id}
               project={p}
               len={notesByProject[p.id] || 0}
               mod={timeAgo(p.datetimemodified)}
@@ -139,6 +141,7 @@ export default function ProjectsPanel({
 
 function ProjectCard({
   project,
+  selectedId,
   len,
   mod,
   selectProject,
@@ -152,7 +155,10 @@ function ProjectCard({
   );
 
   return (
-    <div className='project-card' onClick={() => selectProject(project)}>
+    <div
+      className={`project-card ${project.id === selectedId ? 'selected' : ''}`}
+      onClick={() => selectProject(project)
+    }>
       <div className={`project-card-header ${project.isarchived ? "cross-out" : ""}`}>
         <span>{project.text}</span>
         {project.ispinned && <i className="bi bi-pin-angle-fill"></i>}

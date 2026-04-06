@@ -183,6 +183,7 @@ export default function App() {
   return (
     <div className='app'>
       <ProjectsPanel
+        project={project}
         projects={projects}
         notesByProject={notesByProject}
         selectProject={selectProject}

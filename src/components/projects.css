@@ -108,6 +108,14 @@
   background-color: var(--border);
 }
 
+.project-card.selected {
+  background-color: var(--primary);
+}
+
+.project-card.selected:hover {
+  background-color: var(--primary-hover);
+}
+
 .project-card-header {
   width: 100%;
   line-height: 1.25rem;
