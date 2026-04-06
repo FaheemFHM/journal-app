@@ -1,0 +1,107 @@
+/* 
+.content-header {
+  width: 100%;
+  padding-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+
+  border-bottom: 3px solid var(--border);
+  margin-bottom: 0.75rem;
+}
+
+.content-heading-container {
+  gap: 1rem;
+  padding: 0.5rem 0 1rem 0;
+}
+
+.content-heading {
+  height: 100%;
+
+  font-weight: 600;
+  font-size: 1.5rem;
+  line-height: 2rem;
+  padding: 0 0.5rem 0.1rem 0.5rem;
+
+  display: flex;
+  align-items: center;
+
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.content-button {
+  height: 2.5rem;
+  aspect-ratio: 1 / 1;
+  font-size: 0.85rem;
+}
+
+.restore-project-button {
+  height: 100%;
+  width: 100%;
+
+  font-size: 1.25rem;
+  font-weight: 500;
+
+  background-color: var(--primary);
+  border: 1px solid var(--text);
+}
+
+.restore-project-button:hover {
+  background-color: var(--primary-hover);
+}
+
+.content-subheader {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  padding-top: 0.2rem;
+}
+
+.content-grace-period {
+  width: 100%;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+
+  font-size: 1.25rem;
+  font-weight: 500;
+
+  background-color: var(--primary);
+  border: 1px solid var(--text);
+  border-radius: 0.5rem;
+}
+
+.content-fss-labels {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  gap: 0.5rem;
+
+  padding: 0.75rem 0 0.2rem 0;
+  border-top: 1px solid var(--border);
+  margin-top: 0.75rem;
+}
+
+.content-fss-labels div {
+  width: 100%;
+}
+
+.content-fss{
+  gap: 0.5rem;
+  padding-bottom: 0.75rem;
+}
+
+.content-fss button {
+  width: 100%;
+  padding: 0.4rem;
+}
+
+.content-header .search-box input {
+  background-color: var(--surface);
+}
+
+.content-header .dropdown-button {
+  background-color: var(--surface);
+}
+
+.content-header .dropdown-button:hover {
+  background-color: var(--border);
+} */

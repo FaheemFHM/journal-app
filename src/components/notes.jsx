@@ -74,6 +74,179 @@ export default function NotesPanel({
     setSortDir(true);
   };
 
+  const gracePeriod = project != null ? getGracePeriod(
+    project.datetimedeleted,
+    gracePeriodDays,
+    timer
+  ) : "";
+
+  return project != null ?
+  (
+    <div className='notes-panel'>
+      <div className='content-header'>
+
+        <ProjectHeader
+          project={project}
+          onToggle={onToggle}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          nextTheme={nextTheme}
+          toggleTheme={toggleTheme}
+        />
+
+        <GraceLabel
+          show={project.isdeleted}
+          gracePeriod={gracePeriod}
+        />
+
+        <ProjectMetaData
+          created={project.datetimecreated}
+          modified={project.datetimemodified}
+          notesCount={notes.length}
+        />
+
+        <NotesFss
+          search={search}
+          setSearch={setSearch}
+
+          filterOptions={filterOptions}
+          filter={filter}
+          setFilter={setFilter}
+
+          sortOptions={sortOptions}
+          sort={sort}
+          setSort={setSort}
+          sortDir={sortDir}
+
+          resetFilters={resetFilters}
+        />
+
+      </div>
+
+      <NotesList
+        notes={filteredNotes}
+        active={!project.isdeleted}
+        search={search}
+        filtering={applyingFilters}
+        onToggle={onToggle}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+
+      <AddNoteBar
+        isdeleted={!project.isdeleted}
+      />
+
+    </div>
+  ) : (
+    <div className="no-projects"></div>
+  );
+}
+
+function ProjectHeader({
+  project,
+  
+  onToggle,
+  onEdit,
+  onDelete,
+  
+  nextTheme,
+  toggleTheme
+}) {
+  return(
+    <div className='flexrow content-heading-container'>
+
+      <ProjectTitleInput
+        value={project.text}
+        projectId={project.id}
+        onEdit={onEdit}
+        active={!project.isdeleted}
+      />
+
+      <i className='bi bi-dot'></i>
+
+      {
+        project.isdeleted ? (
+          <RestoreButton
+            pId={project.id}
+            doRestore={onDelete}
+          />
+        ) : (
+          <ProjectToggles
+            pId={project.id}
+            ispinned={project.ispinned}
+            isstarred={project.isstarred}
+            isarchived={project.isarchived}
+            onToggle={onToggle}
+            onDelete={onDelete}
+          />
+        )
+      }
+
+      <i className='bi bi-dot'></i>
+
+      <ThemeButton
+        nextTheme={nextTheme}
+        toggleTheme={toggleTheme}
+      />
+
+    </div>
+  );
+}
+
+function NotesFss({
+  search, setSearch,
+  filterOptions, filter, setFilter,
+  sortOptions, sort, setSort, sortDir,
+  resetFilters,
+}) {
+  return(
+    <>
+      <div className='flexrow content-fss-labels'>
+        <div>Search</div>
+        <div>Filter</div>
+        <div>Sort</div>
+      </div>
+      
+      <div className='flexrow content-fss'>
+        <div className="search-box">
+          <i className="bi bi-search"></i>
+          <input
+            type="text"
+            placeholder="Search notes..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <Dropdown
+          options={filterOptions}
+          value={filter}
+          onChange={setFilter}
+        />
+        <Dropdown
+          options={sortOptions}
+          value={sort}
+          onChange={setSort}
+        />
+      </div>
+
+      <div className="flexrow content-fss">
+        <button
+          onClick={() => resetFilters()}
+        >Reset Filters</button>
+        <button
+          onClick={() => setSortDir(!sortDir)}
+        >{sortDir ? "Sort Descending" : "Sort Ascending"}</button>
+      </div>
+    </>
+  );
+}
+
+function ProjectMetaData({
+  created,
+  modified,
+  notesCount
+}) {
   function formatDate(dateString) {
     const date = new Date(dateString);
 
@@ -84,6 +257,100 @@ export default function NotesPanel({
     });
   }
 
+  return (
+    <div className='flexrow content-subheader'>
+      Created [ {formatDate(created)} ] 
+      [ {timeAgo(created)} ] 
+      <i className='bi bi-dot'></i> 
+      Modified [ {formatDate(modified)} ] 
+      [ {timeAgo(modified)} ]
+      <i className='bi bi-dot'></i> 
+      {notesCount} notes
+    </div>
+  );
+}
+
+function GraceLabel({
+  show,
+  gracePeriod
+}) {
+  if (!show) return null;
+
+  return (
+    <div className='flexrow'>
+      <div className="content-grace-period">
+        Time to deletion = {gracePeriod}
+      </div>
+    </div>
+  );
+}
+
+function ProjectToggles({
+  pId,
+  ispinned,
+  isstarred,
+  isarchived,
+  onToggle,
+  onDelete
+}) {
+  return (
+    <>
+      <IconFillButton
+        icon='pin-angle'
+        iconAlt='pin-angle-fill'
+        classList='content-button'
+        active={ispinned}
+        onToggle={() => onToggle(pId, "ispinned", true)}
+      />
+      <IconFillButton
+        icon='star'
+        iconAlt='star-fill'
+        classList='content-button'
+        active={isstarred}
+        onToggle={() => onToggle(pId, "isstarred", true)}
+      />
+      <i className='bi bi-dot'></i>
+      <IconFillButton
+        icon='archive'
+        iconAlt='archive-fill'
+        classList='content-button'
+        active={isarchived}
+        onToggle={() => onToggle(pId, "isarchived", true)}
+      />
+      <IconFillButton
+        icon='trash3'
+        iconAlt='trash3-fill'
+        classList='content-button'
+        active={false}
+        onToggle={() => onDelete(pId, true, true)}
+      />
+    </>
+  );
+}
+
+function RestoreButton({
+  pId,
+  doRestore
+}) {
+  return (
+    <button
+      className="restore-project-button"
+      onClick={() => doRestore(pId, true, false)}
+    >
+      Restore Project
+    </button>
+  );
+}
+
+function NotesList({
+  notes,
+  active,
+  search,
+  filtering,
+  onToggle,
+  onEdit,
+  onDelete
+}) {
   function highlightSearchTerms(noteText) {
     if (!search) return noteText;
 
@@ -99,166 +366,44 @@ export default function NotesPanel({
     );
   }
 
-  const gracePeriod = project != null ? getGracePeriod(
-    project.datetimedeleted,
-    gracePeriodDays,
-    timer
-  ) : "";
-
-  return project != null ?
-  (
-    <div className='notes-panel'>
-      <div className='content-header'>
-        <div className='flexrow content-heading-container'>
-          <ProjectTitleInput
-            value={project.text}
-            projectId={project.id}
+  return (
+    <div className='notes-list'>
+      {notes.length > 0 ? (
+        notes.map(n => (
+          <NoteCard
+            key={n.id}
+            note={n}
+            text={highlightSearchTerms(n.text)}
+            onToggle={onToggle}
             onEdit={onEdit}
-            active={!project.isdeleted}
+            onDelete={onDelete}
+            active={active}
           />
-          <i className='bi bi-dot'></i>
+        ))
+      ) : (
+        <div className="no-notes">
           {
-            project.isdeleted ? (
-              <button
-                className="restore-project-button"
-                onClick={() => onDelete(project.id, true, false)}
-              >
-                Restore Project
-              </button>
-            ) : (
-              <>
-                <IconFillButton
-                  icon='pin-angle'
-                  iconAlt='pin-angle-fill'
-                  classList='content-button'
-                  active={project.ispinned}
-                  onToggle={() => onToggle(project.id, "ispinned", true)}
-                />
-                <IconFillButton
-                  icon='star'
-                  iconAlt='star-fill'
-                  classList='content-button'
-                  active={project.isstarred}
-                  onToggle={() => onToggle(project.id, "isstarred", true)}
-                />
-                <i className='bi bi-dot'></i>
-                <IconFillButton
-                  icon='archive'
-                  iconAlt='archive-fill'
-                  classList='content-button'
-                  active={project.isarchived}
-                  onToggle={() => onToggle(project.id, "isarchived", true)}
-                />
-                <IconFillButton
-                  icon='trash3'
-                  iconAlt='trash3-fill'
-                  classList='content-button'
-                  active={false}
-                  onToggle={() => onDelete(project.id, true, true)}
-                />
-              </>
-            )
+            filtering
+              ? "No notes match your current filters"
+              : "Please create your first note below"
           }
-          <i className='bi bi-dot'></i>
-          <ThemeButton
-            nextTheme={nextTheme}
-            toggleTheme={toggleTheme}
-          />
         </div>
-
-        {
-          project.isdeleted ?
-          (
-            <div className='flexrow'>
-              <div className="content-grace-period">
-              Time to deletion = {gracePeriod}
-              </div>
-            </div>
-          ) : (<></>)
-        }
-
-        <div className='flexrow content-subheader'>
-          Created [ {formatDate(project.datetimecreated)} ] 
-          [ {timeAgo(project.datetimecreated)} ] 
-          <i className='bi bi-dot'></i> 
-          Modified [ {formatDate(project.datetimemodified)} ] 
-          [ {timeAgo(project.datetimemodified)} ]
-          <i className='bi bi-dot'></i> 
-          {notes.length} notes
-        </div>
-
-        <div className='flexrow content-fss-labels'>
-          <div>Search</div>
-          <div>Filter</div>
-          <div>Sort</div>
-        </div>
-        
-        <div className='flexrow content-fss'>
-          <div className="search-box">
-            <i className="bi bi-search"></i>
-            <input
-              type="text"
-              placeholder="Search notes..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-          <Dropdown
-            options={filterOptions}
-            value={filter}
-            onChange={setFilter}
-          />
-          <Dropdown
-            options={sortOptions}
-            value={sort}
-            onChange={setSort}
-          />
-        </div>
-
-        <div className="flexrow content-fss">
-          <button
-            onClick={() => resetFilters()}
-          >Reset Filters</button>
-          <button
-            onClick={() => setSortDir(!sortDir)}
-          >{sortDir ? "Sort Descending" : "Sort Ascending"}</button>
-        </div>
-      </div>
-
-      <div className='content-body'>
-        {filteredNotes.length > 0 ? (
-          filteredNotes.map(n => (
-            <NoteCard
-              key={n.id}
-              note={n}
-              text={highlightSearchTerms(n.text)}
-              onToggle={onToggle}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              active={!project.isdeleted}
-            />
-          ))
-        ) : (
-          <div className="no-notes">
-            {
-              applyingFilters
-                ? "No notes match your current filters"
-                : "Please create your first note below"
-            }
-          </div>
-        )}
-      </div>
-      
-      <div
-        className="content-footer"
-        style={{pointerEvents: !project.isdeleted ? "auto" : "none"}}
-      >
-        <input type='text' placeholder='New note...'></input>
-        <button><i className='bi bi-plus-circle'></i></button>
-      </div>
+      )}
     </div>
-  ) : (
-    <div className="no-projects"></div>
+  );
+}
+
+function AddNoteBar({
+  isdeleted
+}) {
+  return (
+    <div
+      className="content-footer"
+      style={{pointerEvents: isdeleted ? "auto" : "none"}}
+    >
+      <input type='text' placeholder='New note...'></input>
+      <button><i className='bi bi-plus-circle'></i></button>
+    </div>
   );
 }
 
@@ -386,7 +531,10 @@ function NoteCard({
   );
 }
 
-function ThemeButton({nextTheme, toggleTheme}) {
+function ThemeButton({
+  nextTheme,
+  toggleTheme
+}) {
   const [hovered, setHovered] = useState(false);
   const iconClass = `bi bi-${hovered ? nextTheme.iconAlt : nextTheme.icon}`;
 

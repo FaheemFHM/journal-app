@@ -161,8 +161,8 @@ function ProjectCard({
     }>
       <div className={`project-card-header ${project.isarchived ? "cross-out" : ""}`}>
         <span>{project.text}</span>
-        {project.ispinned && <i className="bi bi-pin-angle-fill"></i>}
         {project.isstarred && <i className="bi bi-star-fill"></i>}
+        {project.ispinned && <i className="bi bi-pin-angle-fill"></i>}
       </div>
       {
         project.isdeleted ?
