@@ -1,35 +1,24 @@
 
-export function toggleIcon(
-  xId,
-  field,
-  urlFolder,
-  state,
-  setState
-) {
+// --- Toggle a note ---
+export function toggleNoteIcon(noteId, field, notes, setNotes) {
   const newDate = new Date().toISOString();
 
-  // find item and new value
-  const item = state.find(x => x.id === xId);
-  if (!item) return;
-  const newValue = !item[field];
+  const note = notes.find(n => n.id === noteId);
+  if (!note) return;
 
-  // get new state
-  const prevState = state;
-  const newState = state.map(x =>
-    x.id === xId
-      ? {
-          ...x,
-          [field]: newValue,
-          datetimemodified: newDate
-        }
-      : x
+  const newValue = !note[field];
+  const prevNotes = notes;
+  const newNotes = notes.map(n =>
+    n.id === noteId
+      ? { ...n, [field]: newValue, datetimemodified: newDate }
+      : n
   );
 
   // optimistic update
-  setState(newState);
+  setNotes(newNotes);
 
   // backend update
-  fetch(`http://localhost:5000/${urlFolder}/${xId}`, {
+  fetch(`http://localhost:5000/notes/${noteId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -37,6 +26,41 @@ export function toggleIcon(
       datetimemodified: newDate
     })
   }).catch(() => {
-    setState(prevState);
+    // rollback if backend fails
+    setNotes(prevNotes);
+  });
+}
+
+// --- Toggle a project ---
+export function toggleProjectIcon(projectId, field, projects, setProjects, setProject) {
+  const newDate = new Date().toISOString();
+
+  const project = projects.find(p => p.id === projectId);
+  if (!project) return;
+
+  const newValue = !project[field];
+  const prevProjects = projects;
+  const newProjects = projects.map(p =>
+    p.id === projectId
+      ? { ...p, [field]: newValue, datetimemodified: newDate }
+      : p
+  );
+
+  // optimistic update
+  setProjects(newProjects);
+  setProject(newProjects.find(p => p.id === projectId));
+
+  // backend update
+  fetch(`http://localhost:5000/projects/${projectId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      [field]: newValue,
+      datetimemodified: newDate
+    })
+  }).catch(() => {
+    // rollback if backend fails
+    setProjects(prevProjects);
+    setProject(prevProjects.find(p => p.id === projectId));
   });
 }

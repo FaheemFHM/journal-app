@@ -6,7 +6,7 @@ import ProjectsPanel from "./components/projects";
 import NotesPanel from "./components/notes";
 
 import { isExpired } from "./utils/dates";
-import { toggleIcon } from "./utils/handleToggle";
+import { toggleProjectIcon, toggleNoteIcon } from "./utils/handleToggle";
 import { editProject, editNote } from "./utils/handleEdit";
 import {
   deleteProject,
@@ -58,7 +58,7 @@ export default function App() {
         const remainingProjects = projectsList.filter(
           p => !expiredProjectIds.has(p.id)
         );
-        
+
         const remainingNotes = notesList.filter(
           n => !expiredNoteIds.has(n.id)
         );
@@ -120,13 +120,11 @@ export default function App() {
   // === CRUD handlers ===
 
   function handleToggle(xId, field, isProject) {
-    toggleIcon(
-      xId,
-      field,
-      isProject ? "projects" : "notes",
-      isProject ? projects : notes,
-      isProject ? setProjects : setNotes
-    );
+    if (isProject) {
+      toggleProjectIcon(xId, field, projects, setProjects, setProject);
+    } else {
+      toggleNoteIcon(xId, field, notes, setNotes);
+    }
   }
 
   function handleEdit(xId, value, isProject) {
