@@ -138,13 +138,6 @@ export default function App() {
   function handleDelete(xId, isProject, doDelete) {
     if (isProject) {
       deleteProject(xId, doDelete, projects, setProjects, setProject);
-      
-      // const updatedProjects = projects.map(p =>
-      //   p.id === xId ? { ...p, isdeleted: doDelete } : p
-      // );
-
-      // setProjects(updatedProjects);
-      // setProject(refreshSelectedProject(updatedProjects, xId));
     } else {
       deleteNote(xId, notes, setNotes, setProjects);
     }

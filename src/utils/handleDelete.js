@@ -1,5 +1,11 @@
 
-export function deleteProject(pId, doDelete, projects, setProjects, setProject) {
+export function deleteProject(
+  pId,
+  doDelete, // true = restore | false = soft delete
+  projects,
+  setProjects,
+  setProject
+) {
   // find project
   const project = projects.find(p => p.id === pId);
   if (!project) return;
@@ -11,7 +17,7 @@ export function deleteProject(pId, doDelete, projects, setProjects, setProject) 
     )) return;
   }
 
-  // values
+  // get new values
   const newDate = new Date().toISOString();
   const updates = {
     isdeleted: doDelete,
@@ -30,16 +36,26 @@ export function deleteProject(pId, doDelete, projects, setProjects, setProject) 
   setProjects(newState);
 
   // refresh project selection
-  const activeProjects = newState.filter(p => p.isdeleted !== doDelete);
+  let newSelected;
+  
+  if (doDelete) {
+    // on delete: select the first project that is active
+    const activeProjects = newState.filter(
+      p => p.isdeleted !== doDelete
+    );
 
-  const newSelected = activeProjects.length > 0
-    ? activeProjects.reduce((latest, prj) => {
-        const mod = new Date(prj.datetimemodified);
-        const lastMod = new Date(latest.datetimemodified);
-        return mod > lastMod ? prj : latest;
-      }, activeProjects[0])
-    : null;
-
+    newSelected = activeProjects.length > 0
+      ? activeProjects.reduce((latest, prj) => {
+          const mod = new Date(prj.datetimemodified);
+          const lastMod = new Date(latest.datetimemodified);
+          return mod > lastMod ? prj : latest;
+        }, activeProjects[0])
+      : null;
+  } else {
+    // on restore: select the restored project
+    newSelected = newState.find(p => p.id === pId);
+  }
+  
   setProject(newSelected);
 
   // backend update
