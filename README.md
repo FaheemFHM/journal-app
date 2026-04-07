@@ -28,23 +28,50 @@ A web app for journaling and note-taking, built as a learning project using Reac
 ### Prerequisites
 Please ensure you have the following installed on your system:
 
-- Node.js (this project has been built with v24.14.0)
+- Node.js (tested with v24.14.0)
 - npm
 
-1. Clone Repository
+---
 
+### 1. Clone the Repository
+```bash
 git clone https://github.com/FaheemFHM/journal-app.git
 cd journal-app
+```
 
-2. Install Dependencies
+---
 
+### 2. Install Dependencies
+```bash
 npm install
+```
 
-3. Run Mock Backend
+---
 
-json-server --watch db.json --port 5000
+### 3. Run Mock Backend
+This project uses json-server as a mock API:
 
-4. Run Frontend
+```bash
+npx json-server --watch db.json --port 5000
+```
 
+The API will run at:
+http://localhost:5000
+
+---
+
+### 4. Start Frontend
+In a new terminal, run:
+
+```bash
 npm run dev
+```
 
+The app will run at:
+http://localhost:5173
+
+---
+
+### Notes
+- Ensure both the backend and frontend are running at the same time.
+- If a port is already in use, you may need to change it.
