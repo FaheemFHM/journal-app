@@ -9,14 +9,7 @@ export function deleteProject(
   // find project
   const project = projects.find(p => p.id === pId);
   if (!project) return;
-
-  // get confirmation
-  if (doDelete) {
-    if (!window.confirm(
-      `Delete project {${pId} - ${project.text}}?`
-    )) return;
-  }
-
+  
   // get new values
   const newDate = new Date().toISOString();
   const updates = {
@@ -71,9 +64,6 @@ export function deleteProject(
 }
 
 export function deleteNote(nId, notes, setNotes, setProjects) {
-  // confirm deletion
-  if (!window.confirm(`Delete note ${nId}?`)) return;
-
   // find note
   const note = notes.find(n => n.id === nId);
   if (!note) return;

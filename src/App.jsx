@@ -1,9 +1,10 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, act } from 'react';
 import './App.css';
 
 import ProjectsPanel from "./components/projects";
 import NotesPanel from "./components/notes";
+import Modal from './components/modals';
 
 import {
   isExpired
@@ -36,6 +37,8 @@ export default function App() {
   const gracePeriodDays = 3;
 
   const {nextTheme, toggleTheme} = useTheme();
+
+  const [modal, setModal] = useState(null);
 
   const [projects, setProjects] = useState([]);
   const [project, setProject] = useState(null);
@@ -156,6 +159,15 @@ export default function App() {
 
   // === other functions and values ===
 
+  function openDeleteModal(xId, isProject, doDelete) {
+    const action = doDelete || !isProject ? 'Delete' : 'Restore';
+    const elem = isProject ? 'project' : 'note';
+    setModal({
+      text: `${action} ${elem} with ID = ${xId} ?`,
+      onConfirm: () => handleDelete(xId, isProject, doDelete)
+    });
+  }
+
   function setFirstProject(remainingProjects) {
     const activeProjects = remainingProjects.filter(p => !p.isdeleted);
     const defaultProject = getFirstProject(activeProjects);
@@ -191,7 +203,7 @@ export default function App() {
   
   // === return app jsx ===
 
-  return (
+  return (<>
     <div className='app'>
       <ProjectsPanel
         project={project}
@@ -211,11 +223,18 @@ export default function App() {
 
         onToggle={handleToggle}
         onEdit={handleEdit}
-        onDelete={handleDelete}
+        onDelete={openDeleteModal}
 
         timer={timer}
         gracePeriodDays={gracePeriodDays}
       />
     </div>
-  );
+
+    <Modal
+      modal={modal}
+      onClose={() => {
+        setModal(null);
+      }}
+    />
+  </>);
 }
