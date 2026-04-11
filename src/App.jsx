@@ -1,13 +1,24 @@
 
-import { useState, useEffect, act } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 
 import ProjectsPanel from "./components/projects";
 import NotesPanel from "./components/notes";
 
-import { isExpired } from "./utils/dates";
-import { toggleProjectIcon, toggleNoteIcon } from "./utils/handleToggle";
-import { editProject, editNote } from "./utils/handleEdit";
+import {
+  isExpired
+} from "./utils/dates";
+
+import {
+  toggleProjectIcon,
+  toggleNoteIcon
+} from "./utils/handleToggle";
+
+import {
+  editProject,
+  editNote
+} from "./utils/handleEdit";
+
 import {
   deleteProject,
   deleteNote,
