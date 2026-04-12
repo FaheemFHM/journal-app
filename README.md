@@ -72,5 +72,5 @@ http://localhost:5173
 ---
 
 ### Notes
-- Ensure both the backend and frontend are running at the same time.
+- Please ensure both the backend and frontend are running at the same time.
 - If a port is already in use, you may need to change it.
