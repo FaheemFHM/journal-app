@@ -20,7 +20,6 @@ A web app for journaling and note-taking, built as a learning project using Reac
 
 ## Future Updates
 - Reordering notes.
-- Note types (dividers, headings, bold, underline, cross-through, italics).
 - Switch from json-server prototype to MongoDB.
 
 ## Installation
