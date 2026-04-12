@@ -26,6 +26,10 @@ import {
   deleteAllExpired
 } from "./utils/handleDelete";
 
+import {
+  addProject
+} from "./utils/handleAdd";
+
 import useTimer from "./utils/useTimer";
 import useTheme from "./utils/useTheme";
 
@@ -143,9 +147,9 @@ export default function App() {
 
   function handleEdit(xId, value, isProject) {
     if (isProject){
-      editProject(xId, value, projects, setProjects);
+      editProject(xId, value, setProjects);
     } else {
-      editNote(xId, value, notes, setNotes, projects, setProjects);
+      editNote(xId, value, setNotes, setProjects);
     }
   }
 
@@ -157,7 +161,25 @@ export default function App() {
     }
   }
 
+  function handleAdd(txt, isProject) {
+    if (isProject) {
+      if (projectTitleExists(txt)) {
+        window.alert(`${txt} already exists.`);
+        return;
+      }
+      addProject(txt, setProjects);
+    } else {
+      //
+    }
+  }
+
   // === other functions and values ===
+
+  function projectTitleExists(txt) {
+    return projects.some(
+      p => p.text.toLowerCase() === txt.toLowerCase()
+    );
+  }
 
   function openDeleteModal(xId, isProject, doDelete) {
     const action = doDelete || !isProject ? 'Delete' : 'Restore';
@@ -208,8 +230,11 @@ export default function App() {
       <ProjectsPanel
         project={project}
         projects={projects}
+
         notesByProject={notesByProject}
         selectProject={selectProject}
+
+        addProject={handleAdd}
 
         timer={timer}
         gracePeriodDays={gracePeriodDays}

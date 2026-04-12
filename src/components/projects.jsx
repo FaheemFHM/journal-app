@@ -12,7 +12,10 @@ export default function ProjectsPanel({
   selectProject,
   timer,
   gracePeriodDays,
+  addProject,
 }) {
+  const [newProject, setNewProject] = useState("");
+
   const filterOptions = ["All", "Pinned", "Starred", "Archived", "Deleted"];
   const sortOptions = ["Modified", "Created", "Size"];
 
@@ -68,7 +71,14 @@ export default function ProjectsPanel({
     setSort(sortOptions[0]);
     setSortDir(false);
   };
-    
+
+  function handleAddProject() {
+    const txt = newProject.trim();
+    if (!txt) return;
+    addProject(txt, true);
+    setNewProject("");
+  }
+
   return (
     <div className='projects-panel'>
       <div className='projects-header'>
@@ -131,10 +141,25 @@ export default function ProjectsPanel({
           </div>
         )}
       </div>
-      <div className='projects-footer'>
-        <input type='text' placeholder='New project...'></input>
-        <button><i className='bi bi-plus-circle'></i></button>
-      </div>
+
+      <form
+        className='projects-footer'
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleAddProject();
+        }}
+      >
+        <input
+          type='text'
+          placeholder='New project...'
+          value={newProject}
+          onChange={(e) => setNewProject(e.target.value)}
+        />
+
+        <button type="submit">
+          <i className='bi bi-plus-circle'></i>
+        </button>
+      </form>
     </div>
   );
 }

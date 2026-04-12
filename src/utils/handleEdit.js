@@ -1,5 +1,5 @@
 
-export function editProject(pId, value, projects, setProjects) {
+export function editProject(pId, value, setProjects) {
   const newDate = new Date().toISOString();
 
   setProjects(prev => {
@@ -38,7 +38,7 @@ export function editProject(pId, value, projects, setProjects) {
   });
 }
 
-export function editNote(nId, value, notes, setNotes, projects, setProjects) {
+export function editNote(nId, value, setNotes, setProjects) {
   const newDate = new Date().toISOString();
 
   setNotes(prev => {
