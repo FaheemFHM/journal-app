@@ -1,8 +1,9 @@
 
-export async function addProject(txt, setProjects) {
+export async function addProject(txt, projects, setProjects, setProject) {
   const newDate = new Date().toISOString();
 
   const newProject = {
+    id: getFirstAvailableId(projects),
     text: txt,
     datetimecreated: newDate,
     datetimemodified: newDate,
@@ -23,6 +24,7 @@ export async function addProject(txt, setProjects) {
     const createdProject = await res.json();
 
     setProjects(prev => [...prev, createdProject]);
+    setProject(createdProject);
 
   } catch (err) {
     console.error("Failed to add project:", err);
@@ -44,6 +46,7 @@ export async function addNote(txt, pId, notes, setNotes) {
     
   const newNote =
   {
+    id: getFirstAvailableId(notes),
     "project_id": pId,
     "text": txt,
     "position": newPos,
@@ -67,4 +70,11 @@ export async function addNote(txt, pId, notes, setNotes) {
   } catch (err) {
     console.error("Failed to add note:", err);
   }
+}
+
+function getFirstAvailableId(items) {
+  const used = new Set(items.map(x => Number(x.id)));
+  let id = 1;
+  while (used.has(id)) { id++; }
+  return id;
 }

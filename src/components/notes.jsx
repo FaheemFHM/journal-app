@@ -8,6 +8,7 @@ import Dropdown from "./dropdown";
 export default function NotesPanel({
   project,
   notes,
+  notesBottom,
 
   nextTheme,
   toggleTheme,
@@ -141,6 +142,7 @@ export default function NotesPanel({
         onToggle={onToggle}
         onEdit={onEdit}
         onDelete={onDelete}
+        notesBottom={notesBottom}
       />
 
       <form
@@ -375,7 +377,8 @@ function NotesList({
   filtering,
   onToggle,
   onEdit,
-  onDelete
+  onDelete,
+  notesBottom
 }) {
   function highlightSearchTerms(noteText) {
     if (!search) return noteText;
@@ -395,17 +398,20 @@ function NotesList({
   return (
     <div className='notes-list'>
       {notes.length > 0 ? (
-        notes.map(n => (
-          <NoteCard
-            key={n.id}
-            note={n}
-            text={highlightSearchTerms(n.text)}
-            onToggle={onToggle}
-            onEdit={onEdit}
-            onDelete={onDelete}
-            active={active}
-          />
-        ))
+        <>
+          {notes.map(n => (
+            <NoteCard
+              key={n.id}
+              note={n}
+              text={highlightSearchTerms(n.text)}
+              onToggle={onToggle}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              active={active}
+            />
+          ))}
+          <div ref={notesBottom} />
+        </>
       ) : (
         <div className="no-notes">
           {

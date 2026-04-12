@@ -1,5 +1,5 @@
 
-import { useState, useEffect, act } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './App.css';
 
 import ProjectsPanel from "./components/projects";
@@ -48,6 +48,9 @@ export default function App() {
   const [projects, setProjects] = useState([]);
   const [project, setProject] = useState(null);
   const [notes, setNotes] = useState([]);
+
+  const notesBottom = useRef(null);
+  const [scrollNotesBottom, setScrollNotesBottom] = useState(false);
 
   // === main initialisation ===
 
@@ -168,13 +171,14 @@ export default function App() {
         window.alert(`${txt} already exists.`);
         return;
       }
-      addProject(txt, setProjects);
+      addProject(txt, projects, setProjects, setProject);
     } else {
       if (!project) {
         window.alert("Please select a project to add a note.");
         return;
       }
       addNote(txt, project.id, notes, setNotes);
+      setScrollNotesBottom(true);
     }
   }
 
@@ -227,6 +231,13 @@ export default function App() {
     acc[n.project_id] = (acc[n.project_id] || 0) + 1;
     return acc;
   }, {});
+
+  useEffect(() => {
+    if (scrollNotesBottom) {
+      notesBottom.current?.scrollIntoView({ behavior: "smooth" });
+      setScrollNotesBottom(false);
+    }
+  }, [notes]);
   
   // === return app jsx ===
 
@@ -247,6 +258,7 @@ export default function App() {
       <NotesPanel
         project={project}
         notes={filteredNotes}
+        notesBottom={notesBottom}
         
         nextTheme={nextTheme}
         toggleTheme={toggleTheme}

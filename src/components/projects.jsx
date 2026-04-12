@@ -184,10 +184,11 @@ function ProjectCard({
       className={`project-card ${project.id === selectedId ? 'selected' : ''}`}
       onClick={() => selectProject(project)
     }>
-      <div className={`project-card-header ${project.isarchived ? "cross-out" : ""}`}>
+      <div className={"project-card-header"}>
         <span>{project.text}</span>
         {project.isstarred && <i className="bi bi-star-fill"></i>}
         {project.ispinned && <i className="bi bi-pin-angle-fill"></i>}
+        {project.isarchived && <i className="bi bi-archive-fill"></i>}
       </div>
       {
         project.isdeleted ?
@@ -197,7 +198,7 @@ function ProjectCard({
           </div>
         ) :
         (
-          <div className={`project-card-footer ${project.isarchived ? "cross-out" : ""}`}>
+          <div className={"project-card-footer"}>
             {len} notes 
             <i className='bi bi-dot'></i> 
             Modified {mod}
