@@ -7,6 +7,10 @@ import NotesPanel from "./components/notes";
 import Modal from './components/modals';
 
 import {
+  useToast,
+} from "./components/toast";
+
+import {
   isExpired
 } from "./utils/dates";
 
@@ -42,6 +46,7 @@ export default function App() {
   const gracePeriodDays = 3;
 
   const {nextTheme, toggleTheme} = useTheme();
+  const { showToast } = useToast();
 
   const [modal, setModal] = useState(null);
 
@@ -168,13 +173,13 @@ export default function App() {
   function handleAdd(txt, isProject) {
     if (isProject) {
       if (projectTitleExists(txt)) {
-        window.alert(`${txt} already exists.`);
+        showToast(`${txt} already exists.`);
         return;
       }
       addProject(txt, projects, setProjects, setProject);
     } else {
       if (!project) {
-        window.alert("Please select a project to add a note.");
+        showToast("Please select a project to add a note.");
         return;
       }
       addNote(txt, project.id, notes, setNotes);
