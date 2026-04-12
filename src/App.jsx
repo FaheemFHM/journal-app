@@ -27,7 +27,8 @@ import {
 } from "./utils/handleDelete";
 
 import {
-  addProject
+  addProject,
+  addNote
 } from "./utils/handleAdd";
 
 import useTimer from "./utils/useTimer";
@@ -169,7 +170,11 @@ export default function App() {
       }
       addProject(txt, setProjects);
     } else {
-      //
+      if (!project) {
+        window.alert("Please select a project to add a note.");
+        return;
+      }
+      addNote(txt, project.id, notes, setNotes);
     }
   }
 
@@ -249,6 +254,7 @@ export default function App() {
         onToggle={handleToggle}
         onEdit={handleEdit}
         onDelete={openDeleteModal}
+        onAdd={handleAdd}
 
         timer={timer}
         gracePeriodDays={gracePeriodDays}

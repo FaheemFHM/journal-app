@@ -28,3 +28,43 @@ export async function addProject(txt, setProjects) {
     console.error("Failed to add project:", err);
   }
 }
+
+export async function addNote(txt, pId, notes, setNotes) {
+  const newDate = new Date().toISOString();
+
+  const newPos =
+    Math.max(
+      -1,
+      ...notes.filter(
+        n => n.project_id === pId
+      ).map(
+        n => n.position ?? 0
+      )
+    ) + 1;
+    
+  const newNote =
+  {
+    "project_id": pId,
+    "text": txt,
+    "position": newPos,
+    "datetimecreated": newDate,
+    "datetimemodified": newDate,
+    "ispinned": false,
+    "isstarred": false
+  }
+
+  try {
+    const res = await fetch("http://localhost:5000/notes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newNote)
+    });
+    
+    const createdNote = await res.json();
+
+    setNotes(prev => [...prev, createdNote]);
+
+  } catch (err) {
+    console.error("Failed to add note:", err);
+  }
+}

@@ -15,12 +15,15 @@ export default function NotesPanel({
   onToggle,
   onEdit,
   onDelete,
+  onAdd,
 
   timer,
   gracePeriodDays,
 }) {
   const filterOptions = ["All", "Pinned", "Starred"];
   const sortOptions = ["Position", "Modified", "Created"];
+  
+  const [newNote, setNewNote] = useState("");
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState(filterOptions[0]);
@@ -80,6 +83,13 @@ export default function NotesPanel({
     timer
   ) : "";
 
+  function handleAddNote() {
+    const txt = newNote.trim();
+    if (!txt) return;
+    onAdd(txt, false);
+    setNewNote("");
+  }
+
   return project != null ?
   (
     <div className='notes-panel'>
@@ -133,9 +143,25 @@ export default function NotesPanel({
         onDelete={onDelete}
       />
 
-      <AddNoteBar
-        isdeleted={!project.isdeleted}
-      />
+      <form
+        className='content-footer'
+        style={{pointerEvents: project.isdeleted ? "none" : "auto"}}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleAddNote();
+        }}
+      >
+        <input
+          type='text'
+          placeholder='New note...'
+          value={newNote}
+          onChange={(e) => setNewNote(e.target.value)}
+        />
+
+        <button type="submit">
+          <i className='bi bi-plus-circle'></i>
+        </button>
+      </form>
 
     </div>
   ) : (
@@ -389,20 +415,6 @@ function NotesList({
           }
         </div>
       )}
-    </div>
-  );
-}
-
-function AddNoteBar({
-  isdeleted
-}) {
-  return (
-    <div
-      className="content-footer"
-      style={{pointerEvents: isdeleted ? "auto" : "none"}}
-    >
-      <input type='text' placeholder='New note...'></input>
-      <button><i className='bi bi-plus-circle'></i></button>
     </div>
   );
 }
