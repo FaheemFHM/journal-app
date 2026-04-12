@@ -27,7 +27,8 @@ import {
 import {
   deleteProject,
   deleteNote,
-  deleteAllExpired
+  deleteAllExpired,
+  hardDeleteProject
 } from "./utils/handleDelete";
 
 import {
@@ -170,6 +171,19 @@ export default function App() {
     }
   }
 
+  function handleHardDelete(pId, isSoftDeleted) {
+    if (!isSoftDeleted){
+        showToast(`Project with ID ${pId} has to be soft-deleted before it can be manually hard-deleted.`);
+        return;
+    }
+    setModal({
+      text: `HARD-DELETE project with ID ${pId} ?`,
+      onConfirm: () => hardDeleteProject(
+        pId, projects, setProjects, setProject
+      )
+    });
+  }
+
   function handleAdd(txt, isProject) {
     if (isProject) {
       if (projectTitleExists(txt)) {
@@ -199,7 +213,7 @@ export default function App() {
     const action = doDelete || !isProject ? 'Delete' : 'Restore';
     const elem = isProject ? 'project' : 'note';
     setModal({
-      text: `${action} ${elem} with ID = ${xId} ?`,
+      text: `${action} ${elem} with ID ${xId} ?`,
       onConfirm: () => handleDelete(xId, isProject, doDelete)
     });
   }
@@ -271,6 +285,7 @@ export default function App() {
         onToggle={handleToggle}
         onEdit={handleEdit}
         onDelete={openDeleteModal}
+        onHardDelete={handleHardDelete}
         onAdd={handleAdd}
 
         timer={timer}

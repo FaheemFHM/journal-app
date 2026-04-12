@@ -1,8 +1,4 @@
 
-.toast-container {}
-
-.toast {}
-
 .toast-container {
   position: fixed;
   bottom: 5rem;

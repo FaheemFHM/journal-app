@@ -16,6 +16,7 @@ export default function NotesPanel({
   onToggle,
   onEdit,
   onDelete,
+  onHardDelete,
   onAdd,
 
   timer,
@@ -104,6 +105,15 @@ export default function NotesPanel({
           nextTheme={nextTheme}
           toggleTheme={toggleTheme}
         />
+
+        {project.isdeleted && (
+          <RestorationOptions
+            pId={project.id}
+            isSoftDeleted={project.isdeleted}
+            onRestore={onDelete}
+            onDelete={onHardDelete}
+          />
+        )}
 
         <GraceLabel
           show={project.isdeleted}
@@ -194,12 +204,7 @@ function ProjectHeader({
       <i className='bi bi-dot'></i>
 
       {
-        project.isdeleted ? (
-          <RestoreButton
-            pId={project.id}
-            doRestore={onDelete}
-          />
-        ) : (
+        !project.isdeleted && (<>
           <ProjectToggles
             pId={project.id}
             ispinned={project.ispinned}
@@ -208,10 +213,9 @@ function ProjectHeader({
             onToggle={onToggle}
             onDelete={onDelete}
           />
-        )
+        <i className='bi bi-dot'></i>
+        </>)
       }
-
-      <i className='bi bi-dot'></i>
 
       <ThemeButton
         nextTheme={nextTheme}
@@ -219,6 +223,141 @@ function ProjectHeader({
       />
 
     </div>
+  );
+}
+
+function ProjectToggles({
+  pId,
+  ispinned,
+  isstarred,
+  isarchived,
+  onToggle,
+  onDelete
+}) {
+  return (
+    <>
+      <IconFillButton
+        icon='pin-angle'
+        iconAlt='pin-angle-fill'
+        classList='content-button'
+        active={ispinned}
+        onToggle={() => onToggle(pId, "ispinned", true)}
+      />
+      <IconFillButton
+        icon='star'
+        iconAlt='star-fill'
+        classList='content-button'
+        active={isstarred}
+        onToggle={() => onToggle(pId, "isstarred", true)}
+      />
+      <i className='bi bi-dot'></i>
+      <IconFillButton
+        icon='archive'
+        iconAlt='archive-fill'
+        classList='content-button'
+        active={isarchived}
+        onToggle={() => onToggle(pId, "isarchived", true)}
+      />
+      <IconFillButton
+        icon='trash3'
+        iconAlt='trash3-fill'
+        classList='content-button'
+        active={false}
+        onToggle={() => onDelete(pId, true, true)}
+      />
+    </>
+  );
+}
+
+function RestorationOptions({
+  pId,
+  isSoftDeleted,
+  onRestore,
+  onDelete
+}) {
+  return(<div className="flexrow restoration-subheader">
+    <RestoreButton
+      pId={pId}
+      onRestore={onRestore}
+    />
+    <i className='bi bi-dot'></i>
+    <DeleteButton
+      pId={pId}
+      isSoftDeleted={isSoftDeleted}
+      onDelete={onDelete}
+    />
+  </div>);
+}
+
+function GraceLabel({
+  show,
+  gracePeriod
+}) {
+  if (!show) return null;
+
+  return (
+    <div className='flexrow'>
+      <div className="content-grace-period">
+        Time to deletion = {gracePeriod}
+      </div>
+    </div>
+  );
+}
+
+function ProjectMetaData({
+  created,
+  modified,
+  notesCount
+}) {
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+
+    return date.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  }
+
+  return (
+    <div className='flexrow content-subheader'>
+      Created [ {formatDate(created)} ] 
+      [ {timeAgo(created)} ] 
+      <i className='bi bi-dot'></i> 
+      Modified [ {formatDate(modified)} ] 
+      [ {timeAgo(modified)} ]
+      <i className='bi bi-dot'></i> 
+      {notesCount} notes
+    </div>
+  );
+}
+
+function RestoreButton({
+  pId,
+  onRestore
+}) {
+  return (
+    <button
+      className="restore-project-button"
+      onClick={() => onRestore(pId, true, false)}
+    >
+      Restore Project
+    </button>
+  );
+}
+
+function DeleteButton({
+  pId,
+  isSoftDeleted,
+  onDelete
+}) {
+  return (
+    <button
+      className="restore-project-button"
+      onClick={() => onDelete(pId, isSoftDeleted)}
+    >
+      Hard-Delete Project
+    </button>
   );
 }
 
@@ -267,106 +406,6 @@ function NotesFss({
         >{sortDir ? "Sort Descending" : "Sort Ascending"}</button>
       </div>
     </>
-  );
-}
-
-function ProjectMetaData({
-  created,
-  modified,
-  notesCount
-}) {
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-
-    return date.toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  }
-
-  return (
-    <div className='flexrow content-subheader'>
-      Created [ {formatDate(created)} ] 
-      [ {timeAgo(created)} ] 
-      <i className='bi bi-dot'></i> 
-      Modified [ {formatDate(modified)} ] 
-      [ {timeAgo(modified)} ]
-      <i className='bi bi-dot'></i> 
-      {notesCount} notes
-    </div>
-  );
-}
-
-function GraceLabel({
-  show,
-  gracePeriod
-}) {
-  if (!show) return null;
-
-  return (
-    <div className='flexrow'>
-      <div className="content-grace-period">
-        Time to deletion = {gracePeriod}
-      </div>
-    </div>
-  );
-}
-
-function ProjectToggles({
-  pId,
-  ispinned,
-  isstarred,
-  isarchived,
-  onToggle,
-  onDelete
-}) {
-  return (
-    <>
-      <IconFillButton
-        icon='pin-angle'
-        iconAlt='pin-angle-fill'
-        classList='content-button'
-        active={ispinned}
-        onToggle={() => onToggle(pId, "ispinned", true)}
-      />
-      <IconFillButton
-        icon='star'
-        iconAlt='star-fill'
-        classList='content-button'
-        active={isstarred}
-        onToggle={() => onToggle(pId, "isstarred", true)}
-      />
-      <i className='bi bi-dot'></i>
-      <IconFillButton
-        icon='archive'
-        iconAlt='archive-fill'
-        classList='content-button'
-        active={isarchived}
-        onToggle={() => onToggle(pId, "isarchived", true)}
-      />
-      <IconFillButton
-        icon='trash3'
-        iconAlt='trash3-fill'
-        classList='content-button'
-        active={false}
-        onToggle={() => onDelete(pId, true, true)}
-      />
-    </>
-  );
-}
-
-function RestoreButton({
-  pId,
-  doRestore
-}) {
-  return (
-    <button
-      className="restore-project-button"
-      onClick={() => doRestore(pId, true, false)}
-    >
-      Restore Project
-    </button>
   );
 }
 

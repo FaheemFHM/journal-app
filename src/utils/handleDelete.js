@@ -33,17 +33,7 @@ export function deleteProject(
   
   if (doDelete) {
     // on delete: select the first project that is active
-    const activeProjects = newState.filter(
-      p => p.isdeleted !== doDelete
-    );
-
-    newSelected = activeProjects.length > 0
-      ? activeProjects.reduce((latest, prj) => {
-          const mod = new Date(prj.datetimemodified);
-          const lastMod = new Date(latest.datetimemodified);
-          return mod > lastMod ? prj : latest;
-        }, activeProjects[0])
-      : null;
+    newSelected = findFirstActiveProject(newState);
   } else {
     // on restore: select the restored project
     newSelected = newState.find(p => p.id === pId);
@@ -123,4 +113,41 @@ export async function deleteAllExpired(expiredIds, endpoint) {
       }
     })
   );
+}
+
+export function hardDeleteProject(pId, projects, setProjects, setProject) {
+  const project = projects.find(p => p.id === pId);
+  if (!project) return;
+
+  const prevProjects = projects;
+
+  // update frontend
+  const newProjects = projects.filter(p => p.id !== pId);
+  setProjects(newProjects);
+  setProject(findFirstActiveProject(newProjects));
+
+  // update backend
+  fetch(`http://localhost:5000/projects/${pId}`, {
+    method: "DELETE"
+  }).catch(err => {
+    console.error(err);
+    setProjects(prevProjects);
+  });
+}
+
+function findFirstActiveProject(
+  projects,
+  findActive = true
+) {
+  const activeProjects = projects.filter(
+    p => p.isdeleted !== findActive
+  );
+
+  return activeProjects.length > 0
+    ? activeProjects.reduce((latest, prj) => {
+        const mod = new Date(prj.datetimemodified);
+        const lastMod = new Date(latest.datetimemodified);
+        return mod > lastMod ? prj : latest;
+      }, activeProjects[0])
+    : null;
 }
